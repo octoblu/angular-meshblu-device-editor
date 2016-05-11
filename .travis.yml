@@ -8,14 +8,3 @@ before_script:
 - npm install -g codeclimate-test-reporter
 after_script:
 - codeclimate-test-reporter < coverage/lcov.info
-deploy:
-  provider: s3
-  access_key_id: AKIAJFJGT4PA3PB7DIYQ
-  secret_access_key:
-    secure: OG8k7TJat/j/qXWAPOYXBi6QcimkVQb/deYkVxWMsks0x9SFfNUdejRZo0ZaA/YKw8+6QfbEymAjZ75d3fBZxJOlP8WuNJ5tStpclSzTe7aA09jjb7hnUinxxPV91pyY38tj4gDwvgSWaP+W4/4RemxIoHqLoFNq6POVlKO9CprU4iAWbMACw2whSk8oo6OSayrXIOPK8WEJVS0bYCTeg560A6T/D+s82CVfnpYeUKoe+A9MnhMvPlMcv4jqqndXZX1sjPFy+jBwx61lc+PtKJAGUCDEu7UVKpLt6vrUQDCy+5T4QHCE8kh4wvtln37idoZf6yrKUu0TA4Lvi2ePGB+oaldkkrTCSIjBms7GAG6A+INYxuWo8qWhiiO/rXuvrz63sKYcCXYXNTUXcXlUkzyXU+95IFQjtMea2mk64zVG+W7DleAPoRObFdaW8uFTHNrr2wZNF1QbPNXTlnH2wyCwXq54e/+arawG9aqSE8IRZB/RtnLMMPUsPIPC/6F0srsbk+rub7DKif+oDn2qYXPfhD6L4dyoY0llXQeGK8iWK8EiungCyUIhktiKNoEaF7B5f6ORMz3FvyTAyJGOB+AP87IqcPjOA7Y1viF6g7AonDME5dHUAvB4unL806BNeNFGOGfqAeR95NLTUHtZIx3q+AZXOVNFX4CUAmXG1fs=
-  bucket: angular-meshblu-device-editor
-  skip_cleanup: true
-  region: "us-west-2"
-  acl: public_read
-  on:
-    repo: octoblu/angular-meshblu-device-editor
