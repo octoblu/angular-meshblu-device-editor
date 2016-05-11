@@ -1,0 +1,23 @@
+{
+  "name": "angular-meshblu-device-editor",
+  "description": "An Angular directive for editing Meshblu devices.",
+  "main": "dist/angular-meshblu-device-editor.js",
+  "authors": [
+    "Octoblu",
+    "<serveradmin@octoblu.com> (https://octoblu.com)"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "angular",
+    "meshblu",
+    "octoblu"
+  ],
+  "homepage": "https://github.com/octoblu/angular-meshblu-device-editor",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
