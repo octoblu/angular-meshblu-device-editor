@@ -56,6 +56,7 @@ gulp.task 'webserver', ['bower', 'build', 'build-deps'], ->
   gulp.src '.'
       .pipe webserver()
   gulp.watch './src/**/*', ['build']
+  gulp.watch './bower.json', ['build-deps']
 
 gulp.task 'default', [
   'build'
