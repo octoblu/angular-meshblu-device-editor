@@ -1,21 +1,21 @@
 'use strict';
-(function(){
 angular.module('example', ['angular-meshblu-device-editor']);
+
 var DEVICE = {
   schemas: {
     version: '1.0.0',
     form: {
       message: {
-        Human: {
+        human: {
           angular: ['*']
         },
-        Robot: {
+        robot: {
           angular: ['*']
         }
       }
     },
     message: {
-      Human: {
+      human: {
         type: "object",
         title: "Human",
         properties: {
@@ -31,12 +31,12 @@ var DEVICE = {
         },
         required: ["name", "gender"],
         formSchema: {
-          angular: 'message.Human.angular'
+          angular: 'message.human.angular'
         }
       },
-      Robot: {
+      robot: {
         type: "object",
-        title: "Human",
+        title: "Robot",
         properties: {
           name:  {
             title: "Name",
@@ -49,46 +49,15 @@ var DEVICE = {
         },
         required: ["name", "serialNumber"],
         formSchema: {
-          angular: 'message.Robot.angular'
+          angular: 'message.robot.angular'
         }
       }
     }
   }
 };
 
-
-
-angular.module('example').controller('MessageSchemaExampleController', function(){
-  this.message = {}
-  this.schemas = [{
-    "type": "object",
-    "title": "Human",
-    "properties": {
-      "name":  {
-        "title": "Name",
-        "type": "string"
-      },
-      "gender":  {
-        "title": "Gender",
-        "type": "string"
-      }
-    },
-    "required": ["name"]
-  },{
-    "type": "object",
-    "title": "Robot",
-    "properties": {
-      "serialNumber":  {
-        "title": "Serial Number",
-        "type": "string"
-      },
-      "gender":  {
-        "title": "Gender",
-        "type": "string"
-      }
-    },
-    "required": ["serialNumber"]
-  }]
-});
-
+angular.module('example').controller('ExampleMessageSchemaContainerController', function(){
+  this.message = {};
+  this.schemas = DEVICE.schemas.message;
+  this.selectedSchemaKey = 'robot'
 });

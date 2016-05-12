@@ -1,1 +1,1 @@
-angular.module('angular-meshblu-device-editor', ['schemaForm'])
+angular.module('angular-meshblu-device-editor', ['schemaForm', 'ngLodash'])

@@ -1,7 +1,7 @@
 <div>
   <select
-    ng-options="option.title for option in schemas"
-    ng-model="schema"></select>
+    ng-options="option.key as option.title for option in availabledSchemas"
+    ng-model="selectedSchemaKey"></select>
 
-  <form sf-schema="schema" sf-form="form" sf-model="message"></form>
+  <form sf-schema="schema" sf-form="formSchema" sf-model="message"></form>
 </div>

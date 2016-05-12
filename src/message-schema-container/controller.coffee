@@ -1,10 +1,28 @@
 class MessageSchemaContainer
-  constructor: ($scope) ->
-    $scope.schema = $scope.schemas[0]
-    $scope.form = ['*']
+  constructor: (@scope) ->
+    @scope.availabledSchemas = @availabledSchemas()
+    @scope.selectedSchemaKey = @selectedSchemaKey()
+    @scope.schema = @schema()
+    @scope.formSchema = ['*']
 
-    $scope.$watch 'schema', =>
-      $scope.message = {}
+    @scope.$watch 'selectedSchemaKey', =>
+      @scope.schema  = @schema()
+      @scope.message = {}
+
+  availabledSchemas: =>
+    @schemaKeys().map (key) =>
+      schema = @scope.schemas?[key]
+      title  = schema?.title ? key
+      {key,title}
+
+  schema: =>
+    @scope.schemas?[@scope.selectedSchemaKey]
+
+  schemaKeys: =>
+    Object.keys(@scope.schemas) ? []
+
+  selectedSchemaKey: =>
+    @schemaKeys()[0]
 
 window
 .angular

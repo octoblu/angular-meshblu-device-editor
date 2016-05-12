@@ -5,10 +5,11 @@
   </head>
   <body>
 
-    <div ng-controller="ExampleMessageSchemaController as controller">
+    <div ng-controller="ExampleMessageSchemaContainerController as controller">
       <message-schema-container
         message="controller.message"
-        schemas="controller.schemas" ></message-schema-container>
+        schemas="controller.schemas"
+        selected-schema-key="controller.selectedSchemaKey" ></message-schema-container>
       <pre>{{controller.message | json}}</pre>
     </div>
 

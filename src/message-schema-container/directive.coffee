@@ -9,4 +9,5 @@ window
   scope:
     message: '='
     schemas: '='
+    selectedSchema: '='
 }
