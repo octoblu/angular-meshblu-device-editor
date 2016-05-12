@@ -22,6 +22,7 @@ class MessageSchemaContainer
     Object.keys(@scope.schemas) ? []
 
   selectedSchemaKey: =>
+    return @scope.selectedSchemaKey if @scope.selectedSchemaKey?
     @schemaKeys()[0]
 
 window

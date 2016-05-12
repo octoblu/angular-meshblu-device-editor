@@ -9,5 +9,5 @@ window
   scope:
     message: '='
     schemas: '='
-    selectedSchema: '='
+    selectedSchemaKey: '='
 }
