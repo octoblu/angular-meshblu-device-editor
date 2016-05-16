@@ -16,9 +16,11 @@
   DeviceMessageSchemaContainer = (function() {
     function DeviceMessageSchemaContainer(scope) {
       this.scope = scope;
+      this.setSchemas = bind(this.setSchemas, this);
       this.getTransmogrified = bind(this.getTransmogrified, this);
       this.getSchemas = bind(this.getSchemas, this);
-      this.scope.schemas = this.getSchemas();
+      this.scope.$watch('device', this.setSchemas);
+      this.setSchemas();
     }
 
     DeviceMessageSchemaContainer.prototype.getSchemas = function() {
@@ -31,6 +33,13 @@
       var transmogrifier;
       transmogrifier = new OctobluDeviceSchemaTransmogrifier(this.scope.device);
       return transmogrifier.transmogrify();
+    };
+
+    DeviceMessageSchemaContainer.prototype.setSchemas = function() {
+      if (!this.scope.device) {
+        return;
+      }
+      return this.scope.schemas = this.getSchemas();
     };
 
     return DeviceMessageSchemaContainer;
