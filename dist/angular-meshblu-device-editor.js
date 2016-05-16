@@ -1,1 +1,150 @@
-(function(){var e;e=window.angular,e.module("angular-meshblu-device-editor",["schemaForm"])}).call(this),function(){var e,s,t=function(e,s){return function(){return e.apply(s,arguments)}};s=window.OctobluDeviceSchemaTransmogrifier,e=function(){function e(e){this.scope=e,this.setSchemas=t(this.setSchemas,this),this.getTransmogrified=t(this.getTransmogrified,this),this.getSchemas=t(this.getSchemas,this),this.scope.$watch("device",this.setSchemas),this.setSchemas()}return e.prototype.getSchemas=function(){var e;return e=this.getTransmogrified(),e.schemas.message},e.prototype.getTransmogrified=function(){var e;return e=new s(this.scope.device),e.transmogrify()},e.prototype.setSchemas=function(){return this.scope.device?this.scope.schemas=this.getSchemas():void 0},e}(),window.angular.module("angular-meshblu-device-editor").controller("DeviceMessageSchemaContainer",["$scope",e])}.call(this),function(){window.angular.module("angular-meshblu-device-editor").directive("deviceMessageSchemaContainer",function(){return{restrict:"E",templateUrl:"device-message-schema-container/template.html",replace:!0,controller:"DeviceMessageSchemaContainer",scope:{device:"=",message:"=",selectedSchemaKey:"="}}})}.call(this),function(){var e,s=function(e,s){return function(){return e.apply(s,arguments)}};e=function(){function e(e){this.scope=e,this.selectedSchemaKey=s(this.selectedSchemaKey,this),this.schemaKeys=s(this.schemaKeys,this),this.schema=s(this.schema,this),this.availableSchemas=s(this.availableSchemas,this),this.scope.availableSchemas=this.availableSchemas(),this.scope.selectedSchemaKey=this.selectedSchemaKey(),this.scope.schema=this.schema(),this.scope.formSchema=["*"],this.scope.$watch("selectedSchemaKey",function(e){return function(){return e.scope.schema=e.schema(),e.scope.message={}}}(this))}return e.prototype.availableSchemas=function(){return this.schemaKeys().map(function(e){return function(s){var t,a,c,i;return c=null!=(t=e.scope.schemas)?t[s]:void 0,i=null!=(a=null!=c?c.title:void 0)?a:s,{key:s,title:i}}}(this))},e.prototype.schema=function(){var e;return null!=(e=this.scope.schemas)?e[this.scope.selectedSchemaKey]:void 0},e.prototype.schemaKeys=function(){var e;return null!=(e=Object.keys(this.scope.schemas))?e:[]},e.prototype.selectedSchemaKey=function(){return null!=this.scope.selectedSchemaKey?this.scope.selectedSchemaKey:this.schemaKeys()[0]},e}(),window.angular.module("angular-meshblu-device-editor").controller("MessageSchemaContainer",["$scope",e])}.call(this),function(){window.angular.module("angular-meshblu-device-editor").directive("messageSchemaContainer",function(){return{restrict:"E",templateUrl:"message-schema-container/template.html",replace:!0,controller:"MessageSchemaContainer",scope:{message:"=",schemas:"=",selectedSchemaKey:"="}}})}.call(this),angular.module("angular-meshblu-device-editor").run(["$templateCache",function(e){e.put("device-message-schema-container/template.html",'<div>\n  <message-schema-container\n    message="message"\n    schemas="schemas"\n    selected-schema-key="selectedSchemaKey" ></message-schema-container>\n</div>\n'),e.put("message-schema-container/template.html",'<div>\n  <select\n    ng-options="option.key as option.title for option in availableSchemas"\n    ng-model="selectedSchemaKey"\n    ng-hide="availableSchemas.length == 1"></select>\n\n  <form sf-schema="schema" sf-form="formSchema" sf-model="message"></form>\n</div>\n')}]);
+(function() {
+  var angular;
+
+  angular = window.angular;
+
+  angular.module('angular-meshblu-device-editor', ['schemaForm']);
+
+}).call(this);
+
+(function() {
+  var DeviceMessageSchemaContainer, OctobluDeviceSchemaTransmogrifier,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
+
+  DeviceMessageSchemaContainer = (function() {
+    function DeviceMessageSchemaContainer(scope) {
+      this.scope = scope;
+      this.setSchemas = bind(this.setSchemas, this);
+      this.getTransmogrified = bind(this.getTransmogrified, this);
+      this.getSchemas = bind(this.getSchemas, this);
+      this.scope.$watch('device', this.setSchemas);
+      this.setSchemas();
+    }
+
+    DeviceMessageSchemaContainer.prototype.getSchemas = function() {
+      var transmogrified;
+      transmogrified = this.getTransmogrified();
+      return transmogrified.schemas.message;
+    };
+
+    DeviceMessageSchemaContainer.prototype.getTransmogrified = function() {
+      var transmogrifier;
+      transmogrifier = new OctobluDeviceSchemaTransmogrifier(this.scope.device);
+      return transmogrifier.transmogrify();
+    };
+
+    DeviceMessageSchemaContainer.prototype.setSchemas = function() {
+      if (!this.scope.device) {
+        return;
+      }
+      return this.scope.schemas = this.getSchemas();
+    };
+
+    return DeviceMessageSchemaContainer;
+
+  })();
+
+  window.angular.module('angular-meshblu-device-editor').controller('DeviceMessageSchemaContainer', ['$scope', DeviceMessageSchemaContainer]);
+
+}).call(this);
+
+(function() {
+  window.angular.module('angular-meshblu-device-editor').directive('deviceMessageSchemaContainer', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'device-message-schema-container/template.html',
+      replace: true,
+      controller: 'DeviceMessageSchemaContainer',
+      scope: {
+        device: '=',
+        message: '=',
+        selectedSchemaKey: '='
+      }
+    };
+  });
+
+}).call(this);
+
+(function() {
+  var MessageSchemaContainer,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  MessageSchemaContainer = (function() {
+    function MessageSchemaContainer(scope) {
+      this.scope = scope;
+      this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
+      this.schemaKeys = bind(this.schemaKeys, this);
+      this.schema = bind(this.schema, this);
+      this.availableSchemas = bind(this.availableSchemas, this);
+      this.scope.availableSchemas = this.availableSchemas();
+      this.scope.selectedSchemaKey = this.selectedSchemaKey();
+      this.scope.schema = this.schema();
+      this.scope.formSchema = ['*'];
+      this.scope.$watch('selectedSchemaKey', (function(_this) {
+        return function() {
+          _this.scope.schema = _this.schema();
+          return _this.scope.message = {};
+        };
+      })(this));
+    }
+
+    MessageSchemaContainer.prototype.availableSchemas = function() {
+      return this.schemaKeys().map((function(_this) {
+        return function(key) {
+          var ref, ref1, schema, title;
+          schema = (ref = _this.scope.schemas) != null ? ref[key] : void 0;
+          title = (ref1 = schema != null ? schema.title : void 0) != null ? ref1 : key;
+          return {
+            key: key,
+            title: title
+          };
+        };
+      })(this));
+    };
+
+    MessageSchemaContainer.prototype.schema = function() {
+      var ref;
+      return (ref = this.scope.schemas) != null ? ref[this.scope.selectedSchemaKey] : void 0;
+    };
+
+    MessageSchemaContainer.prototype.schemaKeys = function() {
+      var ref;
+      return (ref = Object.keys(this.scope.schemas)) != null ? ref : [];
+    };
+
+    MessageSchemaContainer.prototype.selectedSchemaKey = function() {
+      if (this.scope.selectedSchemaKey != null) {
+        return this.scope.selectedSchemaKey;
+      }
+      return this.schemaKeys()[0];
+    };
+
+    return MessageSchemaContainer;
+
+  })();
+
+  window.angular.module('angular-meshblu-device-editor').controller('MessageSchemaContainer', ['$scope', MessageSchemaContainer]);
+
+}).call(this);
+
+(function() {
+  window.angular.module('angular-meshblu-device-editor').directive('messageSchemaContainer', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'message-schema-container/template.html',
+      replace: true,
+      controller: 'MessageSchemaContainer',
+      scope: {
+        message: '=',
+        schemas: '=',
+        selectedSchemaKey: '='
+      }
+    };
+  });
+
+}).call(this);
+
+angular.module("angular-meshblu-device-editor").run(["$templateCache", function($templateCache) {$templateCache.put("device-message-schema-container/template.html","<div>\n  <message-schema-container\n    message=\"message\"\n    schemas=\"schemas\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
+$templateCache.put("message-schema-container/template.html","<div>\n  <select\n    ng-options=\"option.key as option.title for option in availableSchemas\"\n    ng-model=\"selectedSchemaKey\"\n    ng-hide=\"availableSchemas.length == 1\"></select>\n\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n</div>\n");}]);
