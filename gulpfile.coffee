@@ -15,7 +15,6 @@ gulp.task 'build', ['build-coffee', 'build-templates'], ->
   gulp.src ['./dist/compiled-coffee.js', './dist/compiled-templates.js']
       .pipe plumber()
       .pipe concat('angular-meshblu-device-editor.js')
-      .pipe uglify()
       .pipe gulp.dest('./dist/')
 
 gulp.task 'build-coffee', ->
