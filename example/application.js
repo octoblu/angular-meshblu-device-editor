@@ -94,3 +94,8 @@ angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerCont
   this.message = {};
   this.device = angular.copy(OLD_DEVICE);
 });
+
+angular.module('example').controller('ExampleEmptyDeviceMessageSchemaContainerController', function(){
+  this.message = {};
+  this.device = {};
+});

@@ -39,7 +39,8 @@
       if (!this.scope.device) {
         return;
       }
-      return this.scope.schemas = this.getSchemas();
+      this.scope.schemas = this.getSchemas();
+      return console.log('@scope.schemas', this.scope.schemas);
     };
 
     return DeviceMessageSchemaContainer;

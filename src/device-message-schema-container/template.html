@@ -1,5 +1,7 @@
 <div>
+  <h3 ng-hide="schemas">Device does not contain a message schema.</h3>
   <message-schema-container
+    ng-show="schemas"
     message="message"
     schemas="schemas"
     selected-schema-key="selectedSchemaKey" ></message-schema-container>
