@@ -110,8 +110,10 @@
     };
 
     MessageSchemaContainer.prototype.schemaKeys = function() {
-      var ref;
-      return (ref = Object.keys(this.scope.schemas)) != null ? ref : [];
+      if (!this.scope.schemas) {
+        return [];
+      }
+      return Object.keys(this.scope.schemas);
     };
 
     MessageSchemaContainer.prototype.selectedSchemaKey = function() {
