@@ -19,7 +19,8 @@ class MessageSchemaContainer
     @scope.schemas?[@scope.selectedSchemaKey]
 
   schemaKeys: =>
-    Object.keys(@scope.schemas) ? []
+    return [] unless @scope.schemas
+    return Object.keys @scope.schemas
 
   selectedSchemaKey: =>
     return @scope.selectedSchemaKey if @scope.selectedSchemaKey?
