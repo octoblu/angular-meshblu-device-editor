@@ -16,7 +16,6 @@ class DeviceMessageSchemaContainer
   setSchemas: =>
     return unless @scope.device
     @scope.schemas = @getSchemas()
-    console.log '@scope.schemas', @scope.schemas
 
 window
 .angular

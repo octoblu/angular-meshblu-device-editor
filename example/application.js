@@ -90,10 +90,16 @@ angular.module('example').controller('ExampleDeviceMessageSchemaContainerControl
   this.selectedSchemaKey = 'robot'
 });
 
-angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerController', function(){
-  this.message = {};
-  this.device = angular.copy(OLD_DEVICE);
-});
+angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerController', ['$timeout', function($timeout){
+  var self = this;
+
+  self.message = {};
+  self.device = {};
+
+  $timeout(function(){
+    self.device = angular.copy(OLD_DEVICE);
+  }, 100);
+}]);
 
 angular.module('example').controller('ExampleEmptyDeviceMessageSchemaContainerController', function(){
   this.message = {};

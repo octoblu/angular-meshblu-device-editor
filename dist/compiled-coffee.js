@@ -39,8 +39,7 @@
       if (!this.scope.device) {
         return;
       }
-      this.scope.schemas = this.getSchemas();
-      return console.log('@scope.schemas', this.scope.schemas);
+      return this.scope.schemas = this.getSchemas();
     };
 
     return DeviceMessageSchemaContainer;
@@ -75,20 +74,14 @@
   MessageSchemaContainer = (function() {
     function MessageSchemaContainer(scope) {
       this.scope = scope;
+      this.setAvailableSchemas = bind(this.setAvailableSchemas, this);
       this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
       this.schemaKeys = bind(this.schemaKeys, this);
       this.schema = bind(this.schema, this);
+      this.reset = bind(this.reset, this);
       this.availableSchemas = bind(this.availableSchemas, this);
-      this.scope.availableSchemas = this.availableSchemas();
-      this.scope.selectedSchemaKey = this.selectedSchemaKey();
-      this.scope.schema = this.schema();
-      this.scope.formSchema = ['*'];
-      this.scope.$watch('selectedSchemaKey', (function(_this) {
-        return function() {
-          _this.scope.schema = _this.schema();
-          return _this.scope.message = {};
-        };
-      })(this));
+      this.scope.$watch('schemas', this.setAvailableSchemas);
+      this.scope.$watch('selectedSchemaKey', this.reset);
     }
 
     MessageSchemaContainer.prototype.availableSchemas = function() {
@@ -103,6 +96,11 @@
           };
         };
       })(this));
+    };
+
+    MessageSchemaContainer.prototype.reset = function() {
+      this.scope.schema = this.schema();
+      return this.scope.message = {};
     };
 
     MessageSchemaContainer.prototype.schema = function() {
@@ -122,6 +120,13 @@
         return this.scope.selectedSchemaKey;
       }
       return this.schemaKeys()[0];
+    };
+
+    MessageSchemaContainer.prototype.setAvailableSchemas = function() {
+      this.scope.availableSchemas = this.availableSchemas();
+      this.scope.selectedSchemaKey = this.selectedSchemaKey();
+      this.scope.schema = this.schema();
+      return this.scope.formSchema = ['*'];
     };
 
     return MessageSchemaContainer;
