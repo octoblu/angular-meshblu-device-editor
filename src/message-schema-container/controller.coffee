@@ -1,6 +1,6 @@
 class MessageSchemaContainer
   constructor: (@scope) ->
-    @scope.availabledSchemas = @availabledSchemas()
+    @scope.availableSchemas = @availableSchemas()
     @scope.selectedSchemaKey = @selectedSchemaKey()
     @scope.schema = @schema()
     @scope.formSchema = ['*']
@@ -9,7 +9,7 @@ class MessageSchemaContainer
       @scope.schema  = @schema()
       @scope.message = {}
 
-  availabledSchemas: =>
+  availableSchemas: =>
     @schemaKeys().map (key) =>
       schema = @scope.schemas?[key]
       title  = schema?.title ? key
