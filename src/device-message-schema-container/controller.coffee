@@ -3,9 +3,12 @@
 class DeviceMessageSchemaContainer
   constructor: (@scope) ->
     @scope.$watch 'device', @setSchemas
-    @setSchemas()
 
-  getSchemas: =>
+  getMessageFormSchemas: =>
+    transmogrified = @getTransmogrified()
+    transmogrified.schemas.form
+
+  getMessageSchemas: =>
     transmogrified = @getTransmogrified()
     transmogrified.schemas.message
 
@@ -15,7 +18,8 @@ class DeviceMessageSchemaContainer
 
   setSchemas: =>
     return unless @scope.device
-    @scope.schemas = @getSchemas()
+    @scope.schemas = @getMessageSchemas()
+    @scope.formSchemas = @getMessageFormSchemas()
 
 window
 .angular

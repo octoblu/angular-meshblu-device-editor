@@ -25,7 +25,7 @@ var DEVICE = {
               key: 'name'
             },
             {
-              key: 'serialNumber',
+              key: 'serialNumber'
             }
           ]
         }
@@ -79,6 +79,34 @@ var DEVICE = {
   }
 };
 
+var OLD_DEVICE = {
+  messageFormSchema: [
+    { key: 'name' },
+    { key: 'serialNumber' }
+  ],
+  messageSchema: {
+    type: "object",
+    title: "Robot",
+    properties: {
+      name:  {
+        title: "Name",
+        type: "string"
+      },
+      serialNumber:  {
+        title: "SerialNumber",
+        type: "string"
+      },
+      secretMission:  {
+        title: "Secret Mission",
+        type: "string",
+        enum: ["DestroyHumans"],
+        default: 'DestroyHumans'
+      }
+    },
+    required: ["name", "serialNumber", "secretMission"]
+  }
+}
+
 angular.module('example').controller('ExampleMessageSchemaContainerController', function(){
   this.message = {};
   this.schemas = angular.copy(DEVICE.schemas.message);
@@ -90,4 +118,9 @@ angular.module('example').controller('ExampleDeviceMessageSchemaContainerControl
   this.message = {};
   this.device = angular.copy(DEVICE);
   this.selectedSchemaKey = 'robot';
+});
+
+angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerController', function(){
+  this.message = {};
+  this.device = angular.copy(OLD_DEVICE);
 });

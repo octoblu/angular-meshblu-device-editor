@@ -73,10 +73,7 @@ var OLD_DEVICE = {
         default: "male"
       },
     },
-    required: ["name", "gender"],
-    formSchema: {
-      angular: 'message.human.angular'
-    }
+    required: ["name", "gender"]
   }
 }
 
