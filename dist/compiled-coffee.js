@@ -68,8 +68,10 @@
 }).call(this);
 
 (function() {
-  var MessageSchemaContainer,
+  var MessageSchemaContainer, _,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  _ = window._;
 
   MessageSchemaContainer = (function() {
     function MessageSchemaContainer(scope) {
@@ -78,10 +80,16 @@
       this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
       this.schemaKeys = bind(this.schemaKeys, this);
       this.schema = bind(this.schema, this);
-      this.reset = bind(this.reset, this);
+      this.formSchema = bind(this.formSchema, this);
       this.availableSchemas = bind(this.availableSchemas, this);
       this.scope.$watch('schemas', this.setAvailableSchemas);
-      this.scope.$watch('selectedSchemaKey', this.reset);
+      this.scope.$watch('selectedSchemaKey', (function(_this) {
+        return function() {
+          _this.scope.schema = _this.schema();
+          _this.scope.formSchema = _this.formSchema();
+          return _this.scope.message = {};
+        };
+      })(this));
     }
 
     MessageSchemaContainer.prototype.availableSchemas = function() {
@@ -98,9 +106,15 @@
       })(this));
     };
 
-    MessageSchemaContainer.prototype.reset = function() {
-      this.scope.schema = this.schema();
-      return this.scope.message = {};
+    MessageSchemaContainer.prototype.formSchema = function() {
+      var formSchema, key, ref, schema;
+      schema = this.schema();
+      key = schema != null ? (ref = schema.formSchema) != null ? ref.angular : void 0 : void 0;
+      if (key == null) {
+        return ['*'];
+      }
+      formSchema = _.get(this.scope.formSchemas, key);
+      return formSchema;
     };
 
     MessageSchemaContainer.prototype.schema = function() {
@@ -109,24 +123,21 @@
     };
 
     MessageSchemaContainer.prototype.schemaKeys = function() {
-      if (!this.scope.schemas) {
-        return [];
-      }
-      return Object.keys(this.scope.schemas);
+      return _.keys(this.scope.schemas);
     };
 
     MessageSchemaContainer.prototype.selectedSchemaKey = function() {
       if (this.scope.selectedSchemaKey != null) {
         return this.scope.selectedSchemaKey;
       }
-      return this.schemaKeys()[0];
+      return _.first(this.schemaKeys());
     };
 
     MessageSchemaContainer.prototype.setAvailableSchemas = function() {
       this.scope.availableSchemas = this.availableSchemas();
       this.scope.selectedSchemaKey = this.selectedSchemaKey();
       this.scope.schema = this.schema();
-      return this.scope.formSchema = ['*'];
+      return this.scope.formSchema = this.formSchema();
     };
 
     return MessageSchemaContainer;
@@ -145,6 +156,7 @@
       replace: true,
       controller: 'MessageSchemaContainer',
       scope: {
+        formSchemas: '=',
         message: '=',
         schemas: '=',
         selectedSchemaKey: '='

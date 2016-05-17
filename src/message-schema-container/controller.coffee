@@ -1,7 +1,12 @@
+{_} = window
+
 class MessageSchemaContainer
   constructor: (@scope) ->
     @scope.$watch 'schemas', @setAvailableSchemas
-    @scope.$watch 'selectedSchemaKey', @reset
+    @scope.$watch 'selectedSchemaKey', =>
+      @scope.schema  = @schema()
+      @scope.formSchema = @formSchema()
+      @scope.message = {}
 
   availableSchemas: =>
     @schemaKeys().map (key) =>
@@ -9,26 +14,28 @@ class MessageSchemaContainer
       title  = schema?.title ? key
       {key,title}
 
-  reset: =>
-    @scope.schema  = @schema()
-    @scope.message = {}
+  formSchema: =>
+    schema = @schema()
+    key = schema?.formSchema?.angular
+    return ['*'] unless key?
+    formSchema = _.get @scope.formSchemas, key
+    return formSchema
 
   schema: =>
     @scope.schemas?[@scope.selectedSchemaKey]
 
   schemaKeys: =>
-    return [] unless @scope.schemas
-    return Object.keys @scope.schemas
+    _.keys @scope.schemas
 
   selectedSchemaKey: =>
     return @scope.selectedSchemaKey if @scope.selectedSchemaKey?
-    @schemaKeys()[0]
+    _.first @schemaKeys()
 
   setAvailableSchemas: =>
     @scope.availableSchemas = @availableSchemas()
     @scope.selectedSchemaKey = @selectedSchemaKey()
     @scope.schema = @schema()
-    @scope.formSchema = ['*']
+    @scope.formSchema = @formSchema()
 
 window
 .angular

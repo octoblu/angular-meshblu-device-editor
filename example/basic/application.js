@@ -26,7 +26,8 @@ var DEVICE = {
           gender:  {
             title: "Gender",
             type: "string",
-            enum: ["male", "other"]
+            enum: ["male", "other"],
+            default: "male"
           },
         },
         required: ["name", "gender"],
@@ -68,7 +69,8 @@ var OLD_DEVICE = {
       gender:  {
         title: "Gender",
         type: "string",
-        enum: ["male", "other"]
+        enum: ["male", "other"],
+        default: "male"
       },
     },
     required: ["name", "gender"],
