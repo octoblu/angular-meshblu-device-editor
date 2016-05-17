@@ -91,10 +91,12 @@
       this.availableSchemas = bind(this.availableSchemas, this);
       this.scope.$watch('schemas', this.setAvailableSchemas);
       this.scope.$watch('selectedSchemaKey', (function(_this) {
-        return function() {
+        return function(theNew, theOld) {
           _this.scope.schema = _this.schema();
           _this.scope.formSchema = _this.formSchema();
-          return _this.scope.message = {};
+          if (theNew !== theOld) {
+            return _this.scope.message = {};
+          }
         };
       })(this));
     }

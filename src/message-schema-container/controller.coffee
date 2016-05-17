@@ -3,10 +3,10 @@
 class MessageSchemaContainer
   constructor: (@scope) ->
     @scope.$watch 'schemas', @setAvailableSchemas
-    @scope.$watch 'selectedSchemaKey', =>
+    @scope.$watch 'selectedSchemaKey', (theNew, theOld) =>
       @scope.schema  = @schema()
       @scope.formSchema = @formSchema()
-      @scope.message = {}
+      @scope.message = {} unless theNew == theOld
 
   availableSchemas: =>
     @schemaKeys().map (key) =>

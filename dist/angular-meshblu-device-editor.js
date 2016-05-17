@@ -91,10 +91,12 @@
       this.availableSchemas = bind(this.availableSchemas, this);
       this.scope.$watch('schemas', this.setAvailableSchemas);
       this.scope.$watch('selectedSchemaKey', (function(_this) {
-        return function() {
+        return function(theNew, theOld) {
           _this.scope.schema = _this.schema();
           _this.scope.formSchema = _this.formSchema();
-          return _this.scope.message = {};
+          if (theNew !== theOld) {
+            return _this.scope.message = {};
+          }
         };
       })(this));
     }
@@ -174,4 +176,4 @@
 }).call(this);
 
 angular.module("angular-meshblu-device-editor").run(["$templateCache", function($templateCache) {$templateCache.put("device-message-schema-container/template.html","<div>\n  <h3 ng-hide=\"schemas\">Device does not contain a message schema.</h3>\n  <message-schema-container\n    ng-show=\"schemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
-$templateCache.put("message-schema-container/template.html","<div>\n  <div class=\"form-group\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Message Type</label> \n    <select\n      ng-options=\"option.key as option.title for option in availableSchemas\"\n      ng-model=\"selectedSchemaKey\"\n      ng-hide=\"availableSchemas.length == 1\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n</div>\n");}]);
+$templateCache.put("message-schema-container/template.html","<div>\n  <div class=\"form-group\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Message Type</label>\n    <select\n      ng-options=\"option.key as option.title for option in availableSchemas\"\n      ng-model=\"selectedSchemaKey\"\n      ng-hide=\"availableSchemas.length == 1\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n</div>\n");}]);
