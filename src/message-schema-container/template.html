@@ -1,9 +1,11 @@
 <div>
-  <select
-    ng-options="option.key as option.title for option in availableSchemas"
-    ng-model="selectedSchemaKey"
-    ng-hide="availableSchemas.length == 1"
-    class="form-control" ></select>
+  <div class="form-group">
+    <select
+      ng-options="option.key as option.title for option in availableSchemas"
+      ng-model="selectedSchemaKey"
+      ng-hide="availableSchemas.length == 1"
+      class="form-control" ></select>
+  </div>
 
   <form sf-schema="schema" sf-form="formSchema" sf-model="message"></form>
 </div>
