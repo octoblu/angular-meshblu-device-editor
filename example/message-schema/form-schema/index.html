@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html ng-app="example">
+  <head>
+    <title>Meshblu Device Editor - Angular</title>
+  </head>
+  <body>
+    <section ng-controller="ExampleMessageSchemaContainerController as controller">
+      <h1>Message Schema Container</h1>
+      <pre><code>&lt;message-schema-container&gt;</code></pre>
+
+      <message-schema-container
+        message="controller.message"
+        schemas="controller.schemas"
+        form-schemas="controller.formSchemas"
+        selected-schema-key="controller.selectedSchemaKey" ></message-schema-container>
+
+      <h3>Selected Schema: "{{controller.selectedSchemaKey}}"</h3>
+      <pre>{{controller.message | json}}</pre>
+    </section>
+
+    <hr>
+
+    <section ng-controller="ExampleDeviceMessageSchemaContainerController as controller">
+      <h1>Device Message Schema Container</h1>
+      <pre><code>&lt;device-message-schema-container&gt;</code></pre>
+
+      <device-message-schema-container
+        device="controller.device"
+        message="controller.message"
+        selected-schema-key="controller.selectedSchemaKey" ></device-message-schema-container>
+
+      <h3>Selected Schema: "{{controller.selectedSchemaKey}}"</h3>
+      <pre>{{controller.message | json}}</pre>
+    </section>
+
+    <hr>
+
+    <section ng-controller="ExampleOldDeviceMessageSchemaContainerController as controller">
+      <h1>Device Message Schema Container with old Devices</h1>
+      <pre><code>&lt;device-message-schema-container&gt;</code></pre>
+
+      <device-message-schema-container
+        device="controller.device"
+        message="controller.message"
+        selected-schema-key="controller.selectedSchemaKey" ></device-message-schema-container>
+
+      <h3>Selected Schema: "{{controller.selectedSchemaKey}}"</h3>
+      <pre>{{controller.message | json}}</pre>
+    </section>
+
+    <hr>
+
+    <!-- <section ng-controller="ExampleEmptyDeviceMessageSchemaContainerController as controller">
+      <h1>Empty Device Message Schema Container</h1>
+      <pre><code>&lt;device-message-schema-container&gt;</code></pre>
+
+      <device-message-schema-container
+        device="controller.device"
+        message="controller.message"
+        selected-schema-key="controller.selectedSchemaKey" ></device-message-schema-container>
+
+      <h3>Selected Schema: "{{controller.selectedSchemaKey}}"</h3>
+      <pre>{{controller.message | json}}</pre>
+    </section> -->
+
+    <script src="../../dist/dependencies.js"></script>
+    <script src="../../dist/angular-meshblu-device-editor.js"></script>
+    <script src="./application.js"></script>
+  </body>
+</html>
