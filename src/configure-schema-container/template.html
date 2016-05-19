@@ -1,0 +1,12 @@
+<div>
+  <div class="form-group" ng-hide="availableSchemas.length == 1">
+    <label class="control-label" for="selected-schema-key">Message Type</label>
+    <select
+      ng-options="option.key as option.title group by option.group for option in availableSchemas"
+      ng-model="selectedSchemaKey"
+      name="selected-schema-key"
+      class="form-control" ></select>
+  </div>
+
+  <form sf-schema="schema" sf-form="formSchema" sf-model="model"></form>
+</div>

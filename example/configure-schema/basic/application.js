@@ -5,7 +5,7 @@ var DEVICE = {
   schemas: {
     version: '1.0.0',
     form: {
-      message: {
+      configure: {
         human: {
           angular: ['*']
         },
@@ -14,7 +14,7 @@ var DEVICE = {
         }
       }
     },
-    message: {
+    configure: {
       human: {
         type: "object",
         title: "Human",
@@ -32,7 +32,7 @@ var DEVICE = {
         },
         required: ["name", "gender"],
         'x-form-schema': {
-          angular: 'message.human.angular'
+          angular: 'configure.human.angular'
         }
       },
       robot: {
@@ -50,7 +50,7 @@ var DEVICE = {
         },
         required: ["name", "serialNumber"],
         'x-form-schema': {
-          angular: 'message.robot.angular'
+          angular: 'configure.robot.angular'
         }
       }
     }
@@ -58,7 +58,7 @@ var DEVICE = {
 };
 
 var OLD_DEVICE = {
-  messageSchema: {
+  configureSchema: {
     type: "object",
     title: "Human",
     properties: {
@@ -77,30 +77,30 @@ var OLD_DEVICE = {
   }
 }
 
-angular.module('example').controller('ExampleMessageSchemaContainerController', function(){
-  this.message = {};
-  this.schemas = angular.copy(DEVICE.schemas.message);
+angular.module('example').controller('ExampleConfigureSchemaContainerController', function(){
+  this.configure = {};
+  this.schemas = angular.copy(DEVICE.schemas.configure);
   this.selectedSchemaKey = 'robot'
 });
 
-angular.module('example').controller('ExampleDeviceMessageSchemaContainerController', function(){
-  this.message = {};
-  this.device = angular.copy(DEVICE);
+angular.module('example').controller('ExampleDeviceConfigureSchemaContainerController', function(){
+  this.configure = {};
+  this.model = angular.copy(DEVICE);
   this.selectedSchemaKey = 'robot'
 });
 
-angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerController', ['$timeout', function($timeout){
+angular.module('example').controller('ExampleOldDeviceConfigureSchemaContainerController', ['$timeout', function($timeout){
   var self = this;
 
-  self.message = {};
+  self.configure = {};
   self.device = {};
 
   $timeout(function(){
-    self.device = angular.copy(OLD_DEVICE);
+    self.model = angular.copy(OLD_DEVICE);
   }, 100);
 }]);
 
-angular.module('example').controller('ExampleEmptyDeviceMessageSchemaContainerController', function(){
-  this.message = {};
-  this.device = {};
+angular.module('example').controller('ExampleEmptyDeviceConfigureSchemaContainerController', function(){
+  this.configure = {};
+  this.model = {};
 });
