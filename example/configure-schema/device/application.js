@@ -87,13 +87,25 @@ angular.module('example').controller('ExampleConfigureSchemaContainerController'
     name: 'Johnny 5'
   };
   this.schemas = angular.copy(DEVICE.schemas.configure);
-  this.selectedSchemaKey = 'robot'
+  this.model = {
+    schemas: {
+      selected: {
+        configure: 'robot'
+      }
+    }
+  };
 });
 
 angular.module('example').controller('ExampleDeviceConfigureSchemaContainerController', function(){
   this.model = {};
   this.device = angular.copy(DEVICE);
-  this.selectedSchemaKey = 'robot'
+  this.model = {
+    schemas: {
+      selected: {
+        configure: 'robot'
+      }
+    }
+  };
 });
 
 angular.module('example').controller('ExampleOldDeviceConfigureSchemaContainerController', ['$timeout', function($timeout){

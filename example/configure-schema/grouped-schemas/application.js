@@ -104,15 +104,25 @@ var OLD_DEVICE = {
 }
 
 angular.module('example').controller('ExampleConfigureSchemaContainerController', function(){
-  this.model = {};
+  this.model = {
+    schemas: {
+      selected: {
+        configure: 'robot'
+      }
+    }
+  };
   this.schemas = angular.copy(DEVICE.schemas.configure);
-  this.selectedSchemaKey = 'robot'
 });
 
 angular.module('example').controller('ExampleDeviceConfigureSchemaContainerController', function(){
-  this.model = {};
+  this.model = {
+    schemas: {
+      selected: {
+        configure: 'robot'
+      }
+    }
+  };
   this.device = angular.copy(DEVICE);
-  this.selectedSchemaKey = 'robot'
 });
 
 angular.module('example').controller('ExampleOldDeviceConfigureSchemaContainerController', ['$timeout', function($timeout){

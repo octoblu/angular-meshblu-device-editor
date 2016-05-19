@@ -9,5 +9,4 @@ window
   scope:
     device: '='
     model: '='
-    selectedSchemaKey: '='
 }

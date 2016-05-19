@@ -3,7 +3,7 @@
     <label class="control-label" for="selected-schema-key">Configure Type</label>
     <select
       ng-options="option.key as option.title group by option.group for option in availableSchemas"
-      ng-model="selectedSchemaKey"
+      ng-model="model.schemas.selected.configure"
       name="selected-schema-key"
       class="form-control" ></select>
   </div>

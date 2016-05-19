@@ -3,10 +3,10 @@
 class ConfigureSchemaContainer
   constructor: (@scope) ->
     @scope.$watch 'schemas', @setAvailableSchemas
-    @scope.$watch 'selectedSchemaKey', (theNew, theOld) =>
+    @scope.$watch 'model.schemas.selected.configure', (theNew, theOld) =>
+      console.log(theNew, theOld)
       @scope.schema  = @schema()
       @scope.formSchema = @formSchema()
-      @scope.model = {} unless theNew == theOld
 
   availableSchemas: =>
     _.compact @schemaKeys().map (key) =>
@@ -25,18 +25,19 @@ class ConfigureSchemaContainer
     return formSchema
 
   schema: =>
-    @scope.schemas?[@scope.selectedSchemaKey]
+    @scope.schemas?[_.get(@scope.model, 'schemas.selected.configure')]
 
   schemaKeys: =>
     _.keys @scope.schemas
 
   selectedSchemaKey: =>
-    return @scope.selectedSchemaKey if @scope.selectedSchemaKey?
+    selectedSchemaKey = _.get @scope.model, 'schemas.selected.configure'
+    return selectedSchemaKey if selectedSchemaKey
     _.first @schemaKeys()
 
   setAvailableSchemas: =>
     @scope.availableSchemas = @availableSchemas()
-    @scope.selectedSchemaKey = @selectedSchemaKey()
+    _.set @scope.model, 'schemas.selected.configure', @selectedSchemaKey()
     @scope.schema = @schema()
     @scope.formSchema = @formSchema()
 

@@ -10,5 +10,4 @@ window
     formSchemas: '='
     model: '='
     schemas: '='
-    selectedSchemaKey: '='
 }
