@@ -118,7 +118,7 @@
     MessageSchemaContainer.prototype.formSchema = function() {
       var formSchema, key, ref, schema;
       schema = this.schema();
-      key = schema != null ? (ref = schema.formSchema) != null ? ref.angular : void 0 : void 0;
+      key = schema != null ? (ref = schema['x-form-schema']) != null ? ref.angular : void 0 : void 0;
       if (key == null) {
         return ['*'];
       }

@@ -31,7 +31,7 @@ var DEVICE = {
           },
         },
         required: ["name", "gender"],
-        formSchema: {
+        'x-form-schema': {
           angular: 'message.human.angular'
         }
       },
@@ -49,7 +49,7 @@ var DEVICE = {
           }
         },
         required: ["name", "serialNumber"],
-        formSchema: {
+        'x-form-schema': {
           angular: 'message.robot.angular'
         }
       }

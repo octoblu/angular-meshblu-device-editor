@@ -16,7 +16,7 @@ class MessageSchemaContainer
 
   formSchema: =>
     schema = @schema()
-    key = schema?.formSchema?.angular
+    key = schema?['x-form-schema']?.angular
     return ['*'] unless key?
     formSchema = _.get @scope.formSchemas, key
     return formSchema
