@@ -5,7 +5,7 @@ var DEVICE = {
   schemas: {
     version: '1.0.0',
     form: {
-      message: {
+      configure: {
         human: {
           angular: ['*']
         },
@@ -14,43 +14,48 @@ var DEVICE = {
         }
       }
     },
-    message: {
-      human: {
-        type: "object",
-        title: "Human",
-        properties: {
-          name:  {
-            title: "Name",
-            type: "string"
+    configure: {
+      type: "object",
+      properties: {
+        options: {
+          human: {
+            type: "object",
+            title: "Human",
+            properties: {
+              name:  {
+                title: "Name",
+                type: "string"
+              },
+              gender:  {
+                title: "Gender",
+                type: "string",
+                enum: ["male", "other"],
+                default: "male"
+              },
+            },
+            required: ["name", "gender"],
+            formSchema: {
+              angular: 'configure.human.angular'
+            }
           },
-          gender:  {
-            title: "Gender",
-            type: "string",
-            enum: ["male", "other"],
-            default: "male"
-          },
-        },
-        required: ["name", "gender"],
-        formSchema: {
-          angular: 'message.human.angular'
-        }
-      },
-      robot: {
-        type: "object",
-        title: "Robot",
-        properties: {
-          name:  {
-            title: "Name",
-            type: "string"
-          },
-          serialNumber:  {
-            title: "Serial Number",
-            type: "string"
+          robot: {
+            type: "object",
+            title: "Robot",
+            properties: {
+              name:  {
+                title: "Name",
+                type: "string"
+              },
+              serialNumber:  {
+                title: "Serial Number",
+                type: "string"
+              }
+            },
+            required: ["name", "serialNumber"],
+            formSchema: {
+              angular: 'configure.robot.angular'
+            }
           }
-        },
-        required: ["name", "serialNumber"],
-        formSchema: {
-          angular: 'message.robot.angular'
         }
       }
     }
@@ -58,7 +63,7 @@ var DEVICE = {
 };
 
 var OLD_DEVICE = {
-  messageSchema: {
+  optionsSchema: {
     type: "object",
     title: "Human",
     properties: {
@@ -77,24 +82,24 @@ var OLD_DEVICE = {
   }
 }
 
-angular.module('example').controller('ExampleMessageSchemaContainerController', function(){
-  this.message = {
+angular.module('example').controller('ExampleConfigureSchemaContainerController', function(){
+  this.model = {
     name: 'Johnny 5'
   };
-  this.schemas = angular.copy(DEVICE.schemas.message);
+  this.schemas = angular.copy(DEVICE.schemas.configure);
   this.selectedSchemaKey = 'robot'
 });
 
-angular.module('example').controller('ExampleDeviceMessageSchemaContainerController', function(){
-  this.message = {};
+angular.module('example').controller('ExampleDeviceConfigureSchemaContainerController', function(){
+  this.model = {};
   this.device = angular.copy(DEVICE);
   this.selectedSchemaKey = 'robot'
 });
 
-angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerController', ['$timeout', function($timeout){
+angular.module('example').controller('ExampleOldDeviceConfigureSchemaContainerController', ['$timeout', function($timeout){
   var self = this;
 
-  self.message = {};
+  self.model = {};
   self.device = {};
 
   $timeout(function(){
@@ -102,7 +107,7 @@ angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerCont
   }, 100);
 }]);
 
-angular.module('example').controller('ExampleEmptyDeviceMessageSchemaContainerController', function(){
-  this.message = {};
+angular.module('example').controller('ExampleEmptyDeviceConfigureSchemaContainerController', function(){
+  this.model = {};
   this.device = {};
 });

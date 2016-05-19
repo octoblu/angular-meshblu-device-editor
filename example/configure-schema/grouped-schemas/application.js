@@ -5,7 +5,7 @@ var DEVICE = {
   schemas: {
     version: '1.0.0',
     form: {
-      message: {
+      configure: {
         human: {
           angular: ['*']
         },
@@ -17,7 +17,7 @@ var DEVICE = {
         }
       }
     },
-    message: {
+    configure: {
       human: {
         type: "object",
         title: "Human",
@@ -35,7 +35,7 @@ var DEVICE = {
         },
         required: ["name", "gender"],
         'x-form-schema': {
-          angular: 'message.human.angular'
+          angular: 'configure.human.angular'
         },
         'x-group-name': 'Organic'
       },
@@ -56,7 +56,7 @@ var DEVICE = {
         },
         required: ["name", "favoriteNut"],
         'x-form-schema': {
-          angular: 'message.squirrel.angular'
+          angular: 'configure.squirrel.angular'
         },
         'x-group-name': 'Organic'
       },
@@ -75,7 +75,7 @@ var DEVICE = {
         },
         required: ["name", "serialNumber"],
         'x-form-schema': {
-          angular: 'message.robot.angular'
+          angular: 'configure.robot.angular'
         },
         'x-group-name': 'Artificial'
       }
@@ -84,7 +84,7 @@ var DEVICE = {
 };
 
 var OLD_DEVICE = {
-  messageSchema: {
+  optionsSchema: {
     type: "object",
     title: "Human",
     properties: {
@@ -103,22 +103,22 @@ var OLD_DEVICE = {
   }
 }
 
-angular.module('example').controller('ExampleMessageSchemaContainerController', function(){
-  this.message = {};
-  this.schemas = angular.copy(DEVICE.schemas.message);
+angular.module('example').controller('ExampleConfigureSchemaContainerController', function(){
+  this.model = {};
+  this.schemas = angular.copy(DEVICE.schemas.configure);
   this.selectedSchemaKey = 'robot'
 });
 
-angular.module('example').controller('ExampleDeviceMessageSchemaContainerController', function(){
-  this.message = {};
+angular.module('example').controller('ExampleDeviceConfigureSchemaContainerController', function(){
+  this.model = {};
   this.device = angular.copy(DEVICE);
   this.selectedSchemaKey = 'robot'
 });
 
-angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerController', ['$timeout', function($timeout){
+angular.module('example').controller('ExampleOldDeviceConfigureSchemaContainerController', ['$timeout', function($timeout){
   var self = this;
 
-  self.message = {};
+  self.model = {};
   self.device = {};
 
   $timeout(function(){
@@ -126,7 +126,7 @@ angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerCont
   }, 100);
 }]);
 
-angular.module('example').controller('ExampleEmptyDeviceMessageSchemaContainerController', function(){
-  this.message = {};
+angular.module('example').controller('ExampleEmptyDeviceConfigureSchemaContainerController', function(){
+  this.model = {};
   this.device = {};
 });
