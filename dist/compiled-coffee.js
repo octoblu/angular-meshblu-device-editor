@@ -138,7 +138,7 @@
     DeviceConfigureSchemaContainer.prototype.getConfigureSchemas = function() {
       var transmogrified;
       transmogrified = this.getTransmogrified();
-      return transmogrified.schemas.message;
+      return transmogrified.schemas.configure;
     };
 
     DeviceConfigureSchemaContainer.prototype.getTransmogrified = function() {

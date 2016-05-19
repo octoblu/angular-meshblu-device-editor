@@ -10,7 +10,7 @@ class DeviceConfigureSchemaContainer
 
   getConfigureSchemas: =>
     transmogrified = @getTransmogrified()
-    transmogrified.schemas.message
+    transmogrified.schemas.configure
 
   getTransmogrified: =>
     transmogrifier = new OctobluDeviceSchemaTransmogrifier @scope.device

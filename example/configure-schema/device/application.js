@@ -63,7 +63,7 @@ var DEVICE = {
 };
 
 var OLD_DEVICE = {
-  configureSchema: {
+  optionsSchema: {
     type: "object",
     title: "Human",
     properties: {
@@ -83,7 +83,7 @@ var OLD_DEVICE = {
 }
 
 angular.module('example').controller('ExampleConfigureSchemaContainerController', function(){
-  this.configure = {
+  this.model = {
     name: 'Johnny 5'
   };
   this.schemas = angular.copy(DEVICE.schemas.configure);
@@ -91,15 +91,15 @@ angular.module('example').controller('ExampleConfigureSchemaContainerController'
 });
 
 angular.module('example').controller('ExampleDeviceConfigureSchemaContainerController', function(){
-  this.configure = {};
-  this.model = angular.copy(DEVICE);
+  this.model = {};
+  this.device = angular.copy(DEVICE);
   this.selectedSchemaKey = 'robot'
 });
 
 angular.module('example').controller('ExampleOldDeviceConfigureSchemaContainerController', ['$timeout', function($timeout){
   var self = this;
 
-  self.configure = {};
+  self.model = {};
   self.device = {};
 
   $timeout(function(){
@@ -108,6 +108,6 @@ angular.module('example').controller('ExampleOldDeviceConfigureSchemaContainerCo
 }]);
 
 angular.module('example').controller('ExampleEmptyDeviceConfigureSchemaContainerController', function(){
-  this.configure = {};
   this.model = {};
+  this.device = {};
 });

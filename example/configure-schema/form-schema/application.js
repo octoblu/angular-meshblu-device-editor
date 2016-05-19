@@ -80,11 +80,11 @@ var DEVICE = {
 };
 
 var OLD_DEVICE = {
-  configureFormSchema: [
+  optionsFormSchema: [
     { key: 'name' },
     { key: 'serialNumber' }
   ],
-  configureSchema: {
+  optionsSchema: {
     type: "object",
     title: "Robot",
     properties: {
@@ -108,19 +108,19 @@ var OLD_DEVICE = {
 }
 
 angular.module('example').controller('ExampleConfigureSchemaContainerController', function(){
-  this.configure = {};
+  this.model = {};
   this.schemas = angular.copy(DEVICE.schemas.configure);
   this.formSchemas = angular.copy(DEVICE.schemas.form);
   this.selectedSchemaKey = 'robot';
 });
 
 angular.module('example').controller('ExampleDeviceConfigureSchemaContainerController', function(){
-  this.configure = {};
-  this.model = angular.copy(DEVICE);
+  this.model = {};
+  this.device = angular.copy(DEVICE);
   this.selectedSchemaKey = 'robot';
 });
 
 angular.module('example').controller('ExampleOldDeviceConfigureSchemaContainerController', function(){
-  this.configure = {};
-  this.model = angular.copy(OLD_DEVICE);
+  this.model = {};
+  this.device = angular.copy(OLD_DEVICE);
 });

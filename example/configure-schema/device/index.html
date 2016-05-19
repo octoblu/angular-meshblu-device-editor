@@ -10,12 +10,12 @@
       <pre><code>&lt;configure-schema-container&gt;</code></pre>
 
       <configure-schema-container
-        model="controller.device"
+        model="controller.model"
         schemas="controller.schemas"
         selected-schema-key="controller.selectedSchemaKey" ></configure-schema-container>
 
       <h3>Selected Schema: "{{controller.selectedSchemaKey}}"</h3>
-      <pre>{{controller.configure | json}}</pre>
+      <pre>{{controller.model | json}}</pre>
     </section>
 
     <script src="../../../dist/dependencies.js"></script>
