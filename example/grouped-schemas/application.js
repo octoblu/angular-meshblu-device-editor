@@ -9,6 +9,9 @@ var DEVICE = {
         human: {
           angular: ['*']
         },
+        squirrel: {
+          angular: ['*']
+        },
         robot: {
           angular: ['*']
         }
@@ -33,7 +36,8 @@ var DEVICE = {
         required: ["name", "gender"],
         'x-form-schema': {
           angular: 'message.human.angular'
-        }
+        },
+        'x-group-name': 'Organic'
       },
       squirrel: {
         type: "object",
@@ -53,7 +57,8 @@ var DEVICE = {
         required: ["name", "favoriteNut"],
         'x-form-schema': {
           angular: 'message.squirrel.angular'
-        }
+        },
+        'x-group-name': 'Organic'
       },
       robot: {
         type: "object",
@@ -71,7 +76,8 @@ var DEVICE = {
         required: ["name", "serialNumber"],
         'x-form-schema': {
           angular: 'message.robot.angular'
-        }
+        },
+        'x-group-name': 'Artificial'
       }
     }
   }

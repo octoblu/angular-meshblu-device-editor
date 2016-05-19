@@ -9,10 +9,13 @@ class MessageSchemaContainer
       @scope.message = {} unless theNew == theOld
 
   availableSchemas: =>
-    @schemaKeys().map (key) =>
+    _.compact @schemaKeys().map (key) =>
       schema = @scope.schemas?[key]
-      title  = schema?.title ? key
-      {key,title}
+      return unless schema?
+
+      title  = schema.title ? key
+      group  = schema['x-group-name']
+      {key,title,group}
 
   formSchema: =>
     schema = @schema()

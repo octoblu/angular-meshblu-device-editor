@@ -102,17 +102,22 @@
     }
 
     MessageSchemaContainer.prototype.availableSchemas = function() {
-      return this.schemaKeys().map((function(_this) {
+      return _.compact(this.schemaKeys().map((function(_this) {
         return function(key) {
-          var ref, ref1, schema, title;
+          var group, ref, ref1, schema, title;
           schema = (ref = _this.scope.schemas) != null ? ref[key] : void 0;
-          title = (ref1 = schema != null ? schema.title : void 0) != null ? ref1 : key;
+          if (schema == null) {
+            return;
+          }
+          title = (ref1 = schema.title) != null ? ref1 : key;
+          group = schema['x-group-name'];
           return {
             key: key,
-            title: title
+            title: title,
+            group: group
           };
         };
-      })(this));
+      })(this)));
     };
 
     MessageSchemaContainer.prototype.formSchema = function() {

@@ -102,17 +102,22 @@
     }
 
     MessageSchemaContainer.prototype.availableSchemas = function() {
-      return this.schemaKeys().map((function(_this) {
+      return _.compact(this.schemaKeys().map((function(_this) {
         return function(key) {
-          var ref, ref1, schema, title;
+          var group, ref, ref1, schema, title;
           schema = (ref = _this.scope.schemas) != null ? ref[key] : void 0;
-          title = (ref1 = schema != null ? schema.title : void 0) != null ? ref1 : key;
+          if (schema == null) {
+            return;
+          }
+          title = (ref1 = schema.title) != null ? ref1 : key;
+          group = schema['x-group-name'];
           return {
             key: key,
-            title: title
+            title: title,
+            group: group
           };
         };
-      })(this));
+      })(this)));
     };
 
     MessageSchemaContainer.prototype.formSchema = function() {
@@ -176,4 +181,4 @@
 }).call(this);
 
 angular.module("angular-meshblu-device-editor").run(["$templateCache", function($templateCache) {$templateCache.put("device-message-schema-container/template.html","<div>\n  <h3 ng-hide=\"schemas\">Device does not contain a message schema.</h3>\n  <message-schema-container\n    ng-show=\"schemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
-$templateCache.put("message-schema-container/template.html","<div>\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Message Type</label>\n    <select\n      ng-options=\"option.key as option.title for option in availableSchemas\"\n      ng-model=\"selectedSchemaKey\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n</div>\n");}]);
+$templateCache.put("message-schema-container/template.html","<div>\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Message Type</label>\n    <select\n      ng-options=\"option.key as option.title group by option.group for option in availableSchemas\"\n      ng-model=\"selectedSchemaKey\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n</div>\n");}]);
