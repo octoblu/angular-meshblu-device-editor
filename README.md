@@ -2,7 +2,7 @@
 An Angular directive for editing Meshblu devices.
 
 
-[![Bower](https://img.shields.io/bower/v/angular-meshblu-device-editor.svg)](https://github/octoblu/angular-meshblu-device-editor#install) [![Build Status](https://img.shields.io/travis/octoblu/angular-meshblu-device-editor.svg)](https://travis-ci.org/octoblu/angular-meshblu-device-editor) [![Code Climate](https://codeclimate.com/github/octoblu/angular-meshblu-device-editor/badges/gpa.svg)](https://codeclimate.com/github/octoblu/angular-meshblu-device-editor)
+[![Bower](https://img.shields.io/bower/v/angular-meshblu-device-editor.svg)](https://github.com/octoblu/angular-meshblu-device-editor#install) [![Build Status](https://img.shields.io/travis/octoblu/angular-meshblu-device-editor.svg)](https://travis-ci.org/octoblu/angular-meshblu-device-editor) [![Code Climate](https://codeclimate.com/github/octoblu/angular-meshblu-device-editor/badges/gpa.svg)](https://codeclimate.com/github/octoblu/angular-meshblu-device-editor)
 
 # Install
 
