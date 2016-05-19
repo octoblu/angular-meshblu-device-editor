@@ -1,7 +1,7 @@
 <div>
-  <h3 ng-hide="schemas">Device does not contain a message schema.</h3>
+  <h3 ng-hide="hasSchemas">Device does not contain a message schema.</h3>
   <message-schema-container
-    ng-show="schemas"
+    ng-show="hasSchemas"
     message="message"
     schemas="schemas"
     form-schemas="formSchemas"

@@ -8,10 +8,10 @@
 }).call(this);
 
 (function() {
-  var DeviceMessageSchemaContainer, OctobluDeviceSchemaTransmogrifier,
+  var DeviceMessageSchemaContainer, OctobluDeviceSchemaTransmogrifier, _,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
+  _ = window._, OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
 
   DeviceMessageSchemaContainer = (function() {
     function DeviceMessageSchemaContainer(scope) {
@@ -46,7 +46,8 @@
         return;
       }
       this.scope.schemas = this.getMessageSchemas();
-      return this.scope.formSchemas = this.getMessageFormSchemas();
+      this.scope.formSchemas = this.getMessageFormSchemas();
+      return this.scope.hasSchemas = !_.isEmpty(this.scope.schemas);
     };
 
     return DeviceMessageSchemaContainer;
@@ -180,5 +181,5 @@
 
 }).call(this);
 
-angular.module("angular-meshblu-device-editor").run(["$templateCache", function($templateCache) {$templateCache.put("device-message-schema-container/template.html","<div>\n  <h3 ng-hide=\"schemas\">Device does not contain a message schema.</h3>\n  <message-schema-container\n    ng-show=\"schemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
+angular.module("angular-meshblu-device-editor").run(["$templateCache", function($templateCache) {$templateCache.put("device-message-schema-container/template.html","<div>\n  <h3 ng-hide=\"hasSchemas\">Device does not contain a message schema.</h3>\n  <message-schema-container\n    ng-show=\"hasSchemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
 $templateCache.put("message-schema-container/template.html","<div>\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Message Type</label>\n    <select\n      ng-options=\"option.key as option.title group by option.group for option in availableSchemas\"\n      ng-model=\"selectedSchemaKey\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n</div>\n");}]);

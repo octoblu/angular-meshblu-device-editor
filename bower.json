@@ -23,7 +23,7 @@
   "dependencies": {
     "angular": "1.3",
     "angular-schema-form": "^0.8.13",
-    "octoblu-device-schema-transmogrifier": "^6.0.0",
+    "octoblu-device-schema-transmogrifier": "^6.0.2",
     "lodash": "3.10.0"
   },
   "resolutions": {

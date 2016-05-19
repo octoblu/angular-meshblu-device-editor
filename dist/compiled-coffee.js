@@ -8,10 +8,10 @@
 }).call(this);
 
 (function() {
-  var DeviceMessageSchemaContainer, OctobluDeviceSchemaTransmogrifier,
+  var DeviceMessageSchemaContainer, OctobluDeviceSchemaTransmogrifier, _,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
+  _ = window._, OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
 
   DeviceMessageSchemaContainer = (function() {
     function DeviceMessageSchemaContainer(scope) {
@@ -46,7 +46,8 @@
         return;
       }
       this.scope.schemas = this.getMessageSchemas();
-      return this.scope.formSchemas = this.getMessageFormSchemas();
+      this.scope.formSchemas = this.getMessageFormSchemas();
+      return this.scope.hasSchemas = !_.isEmpty(this.scope.schemas);
     };
 
     return DeviceMessageSchemaContainer;

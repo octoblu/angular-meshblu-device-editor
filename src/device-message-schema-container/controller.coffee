@@ -1,4 +1,4 @@
-{OctobluDeviceSchemaTransmogrifier} = window
+{_, OctobluDeviceSchemaTransmogrifier} = window
 
 class DeviceMessageSchemaContainer
   constructor: (@scope) ->
@@ -20,6 +20,7 @@ class DeviceMessageSchemaContainer
     return unless @scope.device
     @scope.schemas = @getMessageSchemas()
     @scope.formSchemas = @getMessageFormSchemas()
+    @scope.hasSchemas  = !_.isEmpty @scope.schemas
 
 window
 .angular
