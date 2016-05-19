@@ -14,7 +14,7 @@ bower install --save angular-meshblu-device-editor
 
 # Directives
 
-* [Device Message Schema Container](#Device Message Schema Container)
+* [Device Message Schema Container](#device-message-schema-container)
 
 
 ## Device Message Schema Container
