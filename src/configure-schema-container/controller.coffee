@@ -4,7 +4,6 @@ class ConfigureSchemaContainer
   constructor: (@scope) ->
     @scope.$watch 'schemas', @setAvailableSchemas
     @scope.$watch 'model.schemas.selected.configure', (theNew, theOld) =>
-      console.log(theNew, theOld)
       @scope.schema  = @schema()
       @scope.formSchema = @formSchema()
 
