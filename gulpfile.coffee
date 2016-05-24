@@ -28,7 +28,7 @@ gulp.task 'build-deps', ['bower'], ->
   gulp.src mainBowerFiles({filter: /\.js$/})
       .pipe plumber()
       .pipe concat('dependencies.js')
-      .pipe uglify()
+      # .pipe uglify()
       .pipe gulp.dest('./dist/')
 
 gulp.task 'build-templates', ->
