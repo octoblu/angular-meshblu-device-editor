@@ -8,11 +8,7 @@ var DEVICE ={
       "$ref": "./message.json"
     },
     "form": {
-      "message": {
-        "media": {
-          "angular": [ '*' ]
-        }
-      }
+      "$ref": "./form.json"
     }
   }
 };
@@ -24,11 +20,7 @@ var ERROR_DEVICE ={
       "$ref": "./doesnt-exist.json"
     },
     "form": {
-      "message": {
-        "media": {
-          "angular": [ '*' ]
-        }
-      }
+      "$ref": "./doesnt-exist.json"
     }
   }
 };
@@ -36,6 +28,7 @@ var ERROR_DEVICE ={
 angular.module('example').controller('ExampleDeviceMessageSchemaContainerController', function(){
   this.message = {};
   this.device  = angular.copy(DEVICE);
+  this.selectedSchemaKey = "robot"
 });
 
 angular.module('example').controller('ExampleErrorDeviceMessageSchemaContainerController', function(){

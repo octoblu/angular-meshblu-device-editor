@@ -257,15 +257,21 @@
       this.scope = scope;
       this.setAvailableSchemas = bind(this.setAvailableSchemas, this);
       this.resolveSchemas = bind(this.resolveSchemas, this);
+      this.resolveFormSchemas = bind(this.resolveFormSchemas, this);
       this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
       this.schemaKeys = bind(this.schemaKeys, this);
       this.schema = bind(this.schema, this);
       this.formSchema = bind(this.formSchema, this);
       this.availableSchemas = bind(this.availableSchemas, this);
       this.scope.$watch('schemas', this.resolveSchemas);
+      this.scope.$watch('formSchemas', this.resolveFormSchemas);
       this.scope.$watch('resolvedSchemas', this.setAvailableSchemas);
+      this.scope.$watch('resolvedFormSchemas', this.setAvailableSchemas);
       this.scope.$watch('selectedSchemaKey', (function(_this) {
         return function(theNew, theOld) {
+          if (!((_this.scope.resolvedSchemas != null) && (_this.scope.resolvedFormSchemas != null))) {
+            return;
+          }
           _this.scope.schema = _this.schema();
           _this.scope.formSchema = _this.formSchema();
           if (theNew !== theOld) {
@@ -301,7 +307,7 @@
       if (key == null) {
         return ['*'];
       }
-      formSchema = _.get(this.scope.formSchemas, key);
+      formSchema = _.get(this.scope.resolvedFormSchemas, key);
       return formSchema;
     };
 
@@ -321,10 +327,20 @@
       return _.first(this.schemaKeys());
     };
 
+    MessageSchemaContainer.prototype.resolveFormSchemas = function() {
+      return $RefParser.dereference(this.scope.formSchemas, (function(_this) {
+        return function(error, formSchemas) {
+          _this.scope.errorFormSchema = error;
+          _this.scope.resolvedFormSchemas = formSchemas;
+          return _this.scope.$apply();
+        };
+      })(this));
+    };
+
     MessageSchemaContainer.prototype.resolveSchemas = function() {
       return $RefParser.dereference(this.scope.schemas, (function(_this) {
         return function(error, schemas) {
-          _this.scope.error = error;
+          _this.scope.errorSchema = error;
           _this.scope.resolvedSchemas = schemas;
           return _this.scope.$apply();
         };
@@ -332,6 +348,9 @@
     };
 
     MessageSchemaContainer.prototype.setAvailableSchemas = function() {
+      if (!((this.scope.resolvedSchemas != null) && (this.scope.resolvedFormSchemas != null))) {
+        return;
+      }
       this.scope.availableSchemas = this.availableSchemas();
       this.scope.selectedSchemaKey = this.selectedSchemaKey();
       this.scope.schema = this.schema();
@@ -367,4 +386,4 @@
 angular.module("angular-meshblu-device-editor").run(["$templateCache", function($templateCache) {$templateCache.put("configure-schema-container/template.html","<div>\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Configure Type</label>\n    <select\n      ng-options=\"option.key as option.title group by option.group for option in availableSchemas\"\n      ng-model=\"model.schemas.selected.configure\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"model\"></form>\n</div>\n");
 $templateCache.put("device-configure-schema-container/template.html","<div>\n  <h3 ng-hide=\"hasSchemas\">Device does not contain a configure schema.</h3>\n  <configure-schema-container\n    ng-show=\"hasSchemas\"\n    model=\"model\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"></configure-schema-container>\n</div>\n");
 $templateCache.put("device-message-schema-container/template.html","<div>\n  <h3 ng-hide=\"hasSchemas\">Device does not contain a message schema.</h3>\n  <message-schema-container\n    ng-show=\"hasSchemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
-$templateCache.put("message-schema-container/template.html","<div>\n  <div class=\"alert alert-danger\" ng-show=\"error\">Error resolving message schema</div>\n\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1 || error\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Message Type</label>\n    <select\n      ng-options=\"option.key as option.title group by option.group for option in availableSchemas\"\n      ng-model=\"selectedSchemaKey\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n</div>\n");}]);
+$templateCache.put("message-schema-container/template.html","<div>\n  <div class=\"alert alert-danger\" ng-show=\"errorFormSchema\">Error resolving form schema</div>\n  <div class=\"alert alert-danger\" ng-show=\"errorSchema\">Error resolving message schema</div>\n\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1 || errorSchema || errorFormSchema\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Message Type</label>\n    <select\n      ng-options=\"option.key as option.title group by option.group for option in availableSchemas\"\n      ng-model=\"selectedSchemaKey\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n</div>\n");}]);

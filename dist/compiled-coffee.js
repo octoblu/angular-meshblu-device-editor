@@ -257,15 +257,21 @@
       this.scope = scope;
       this.setAvailableSchemas = bind(this.setAvailableSchemas, this);
       this.resolveSchemas = bind(this.resolveSchemas, this);
+      this.resolveFormSchemas = bind(this.resolveFormSchemas, this);
       this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
       this.schemaKeys = bind(this.schemaKeys, this);
       this.schema = bind(this.schema, this);
       this.formSchema = bind(this.formSchema, this);
       this.availableSchemas = bind(this.availableSchemas, this);
       this.scope.$watch('schemas', this.resolveSchemas);
+      this.scope.$watch('formSchemas', this.resolveFormSchemas);
       this.scope.$watch('resolvedSchemas', this.setAvailableSchemas);
+      this.scope.$watch('resolvedFormSchemas', this.setAvailableSchemas);
       this.scope.$watch('selectedSchemaKey', (function(_this) {
         return function(theNew, theOld) {
+          if (!((_this.scope.resolvedSchemas != null) && (_this.scope.resolvedFormSchemas != null))) {
+            return;
+          }
           _this.scope.schema = _this.schema();
           _this.scope.formSchema = _this.formSchema();
           if (theNew !== theOld) {
@@ -301,7 +307,7 @@
       if (key == null) {
         return ['*'];
       }
-      formSchema = _.get(this.scope.formSchemas, key);
+      formSchema = _.get(this.scope.resolvedFormSchemas, key);
       return formSchema;
     };
 
@@ -321,10 +327,20 @@
       return _.first(this.schemaKeys());
     };
 
+    MessageSchemaContainer.prototype.resolveFormSchemas = function() {
+      return $RefParser.dereference(this.scope.formSchemas, (function(_this) {
+        return function(error, formSchemas) {
+          _this.scope.errorFormSchema = error;
+          _this.scope.resolvedFormSchemas = formSchemas;
+          return _this.scope.$apply();
+        };
+      })(this));
+    };
+
     MessageSchemaContainer.prototype.resolveSchemas = function() {
       return $RefParser.dereference(this.scope.schemas, (function(_this) {
         return function(error, schemas) {
-          _this.scope.error = error;
+          _this.scope.errorSchema = error;
           _this.scope.resolvedSchemas = schemas;
           return _this.scope.$apply();
         };
@@ -332,6 +348,9 @@
     };
 
     MessageSchemaContainer.prototype.setAvailableSchemas = function() {
+      if (!((this.scope.resolvedSchemas != null) && (this.scope.resolvedFormSchemas != null))) {
+        return;
+      }
       this.scope.availableSchemas = this.availableSchemas();
       this.scope.selectedSchemaKey = this.selectedSchemaKey();
       this.scope.schema = this.schema();

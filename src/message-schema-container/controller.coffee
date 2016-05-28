@@ -3,8 +3,11 @@
 class MessageSchemaContainer
   constructor: (@scope) ->
     @scope.$watch 'schemas', @resolveSchemas
+    @scope.$watch 'formSchemas', @resolveFormSchemas
     @scope.$watch 'resolvedSchemas', @setAvailableSchemas
+    @scope.$watch 'resolvedFormSchemas', @setAvailableSchemas
     @scope.$watch 'selectedSchemaKey', (theNew, theOld) =>
+      return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
       @scope.schema  = @schema()
       @scope.formSchema = @formSchema()
       @scope.message = {} unless theNew == theOld
@@ -22,7 +25,7 @@ class MessageSchemaContainer
     schema = @schema()
     key = schema?['x-form-schema']?.angular
     return ['*'] unless key?
-    formSchema = _.get @scope.formSchemas, key
+    formSchema = _.get @scope.resolvedFormSchemas, key
     return formSchema
 
   schema: =>
@@ -35,13 +38,20 @@ class MessageSchemaContainer
     return @scope.selectedSchemaKey if @scope.selectedSchemaKey?
     _.first @schemaKeys()
 
+  resolveFormSchemas: =>
+    $RefParser.dereference @scope.formSchemas, (error, formSchemas) =>
+      @scope.errorFormSchema = error
+      @scope.resolvedFormSchemas = formSchemas
+      @scope.$apply()
+
   resolveSchemas: =>
     $RefParser.dereference @scope.schemas, (error, schemas) =>
-      @scope.error = error
+      @scope.errorSchema = error
       @scope.resolvedSchemas = schemas
       @scope.$apply()
 
   setAvailableSchemas: =>
+    return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
     @scope.availableSchemas  = @availableSchemas()
     @scope.selectedSchemaKey = @selectedSchemaKey()
     @scope.schema = @schema()

@@ -30,6 +30,12 @@
       "serialNumber":  {
         "title": "Serial Number",
         "type": "string"
+      },
+      "secretMission": {
+        "title": "Secret Mission",
+        "type": "string",
+        "enum": ["DestroyHumans"],
+        "default": "DestroyHumans"
       }
     },
     "required": ["name", "serialNumber"],
