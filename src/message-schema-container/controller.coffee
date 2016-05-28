@@ -39,12 +39,14 @@ class MessageSchemaContainer
     _.first @schemaKeys()
 
   resolveFormSchemas: =>
+    return unless @scope.formSchemas?
     $RefParser.dereference @scope.formSchemas, (error, formSchemas) =>
       @scope.errorFormSchema = error
       @scope.resolvedFormSchemas = formSchemas
       @scope.$apply()
 
   resolveSchemas: =>
+    return unless @scope.schemas?
     $RefParser.dereference @scope.schemas, (error, schemas) =>
       @scope.errorSchema = error
       @scope.resolvedSchemas = schemas
