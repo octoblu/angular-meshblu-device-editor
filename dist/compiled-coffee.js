@@ -247,21 +247,23 @@
 }).call(this);
 
 (function() {
-  var MessageSchemaContainer, _,
+  var $RefParser, MessageSchemaContainer, _,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  _ = window._;
+  _ = window._, $RefParser = window.$RefParser;
 
   MessageSchemaContainer = (function() {
     function MessageSchemaContainer(scope) {
       this.scope = scope;
       this.setAvailableSchemas = bind(this.setAvailableSchemas, this);
+      this.resolveSchemas = bind(this.resolveSchemas, this);
       this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
       this.schemaKeys = bind(this.schemaKeys, this);
       this.schema = bind(this.schema, this);
       this.formSchema = bind(this.formSchema, this);
       this.availableSchemas = bind(this.availableSchemas, this);
-      this.scope.$watch('schemas', this.setAvailableSchemas);
+      this.scope.$watch('schemas', this.resolveSchemas);
+      this.scope.$watch('resolvedSchemas', this.setAvailableSchemas);
       this.scope.$watch('selectedSchemaKey', (function(_this) {
         return function(theNew, theOld) {
           _this.scope.schema = _this.schema();
@@ -277,7 +279,7 @@
       return _.compact(this.schemaKeys().map((function(_this) {
         return function(key) {
           var group, ref, ref1, schema, title;
-          schema = (ref = _this.scope.schemas) != null ? ref[key] : void 0;
+          schema = (ref = _this.scope.resolvedSchemas) != null ? ref[key] : void 0;
           if (schema == null) {
             return;
           }
@@ -305,11 +307,11 @@
 
     MessageSchemaContainer.prototype.schema = function() {
       var ref;
-      return (ref = this.scope.schemas) != null ? ref[this.scope.selectedSchemaKey] : void 0;
+      return (ref = this.scope.resolvedSchemas) != null ? ref[this.scope.selectedSchemaKey] : void 0;
     };
 
     MessageSchemaContainer.prototype.schemaKeys = function() {
-      return _.keys(this.scope.schemas);
+      return _.keys(this.scope.resolvedSchemas);
     };
 
     MessageSchemaContainer.prototype.selectedSchemaKey = function() {
@@ -317,6 +319,16 @@
         return this.scope.selectedSchemaKey;
       }
       return _.first(this.schemaKeys());
+    };
+
+    MessageSchemaContainer.prototype.resolveSchemas = function() {
+      return $RefParser.dereference(this.scope.schemas, (function(_this) {
+        return function(error, schemas) {
+          _this.scope.error = error;
+          _this.scope.resolvedSchemas = schemas;
+          return _this.scope.$apply();
+        };
+      })(this));
     };
 
     MessageSchemaContainer.prototype.setAvailableSchemas = function() {

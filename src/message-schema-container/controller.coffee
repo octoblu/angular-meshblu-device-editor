@@ -1,8 +1,9 @@
-{_} = window
+{_, $RefParser} = window
 
 class MessageSchemaContainer
   constructor: (@scope) ->
-    @scope.$watch 'schemas', @setAvailableSchemas
+    @scope.$watch 'schemas', @resolveSchemas
+    @scope.$watch 'resolvedSchemas', @setAvailableSchemas
     @scope.$watch 'selectedSchemaKey', (theNew, theOld) =>
       @scope.schema  = @schema()
       @scope.formSchema = @formSchema()
@@ -10,7 +11,7 @@ class MessageSchemaContainer
 
   availableSchemas: =>
     _.compact @schemaKeys().map (key) =>
-      schema = @scope.schemas?[key]
+      schema = @scope.resolvedSchemas?[key]
       return unless schema?
 
       title  = schema.title ? key
@@ -25,17 +26,23 @@ class MessageSchemaContainer
     return formSchema
 
   schema: =>
-    @scope.schemas?[@scope.selectedSchemaKey]
+    @scope.resolvedSchemas?[@scope.selectedSchemaKey]
 
   schemaKeys: =>
-    _.keys @scope.schemas
+    _.keys @scope.resolvedSchemas
 
   selectedSchemaKey: =>
     return @scope.selectedSchemaKey if @scope.selectedSchemaKey?
     _.first @schemaKeys()
 
+  resolveSchemas: =>
+    $RefParser.dereference @scope.schemas, (error, schemas) =>
+      @scope.error = error
+      @scope.resolvedSchemas = schemas
+      @scope.$apply()
+
   setAvailableSchemas: =>
-    @scope.availableSchemas = @availableSchemas()
+    @scope.availableSchemas  = @availableSchemas()
     @scope.selectedSchemaKey = @selectedSchemaKey()
     @scope.schema = @schema()
     @scope.formSchema = @formSchema()

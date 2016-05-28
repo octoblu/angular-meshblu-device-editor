@@ -1,0 +1,40 @@
+{
+  "human": {
+    "type": "object",
+    "title": "Human",
+    "properties": {
+      "name":  {
+        "title": "Name",
+        "type": "string"
+      },
+      "gender":  {
+        "title": "Gender",
+        "type": "string",
+        "enum": ["male", "other"],
+        "default": "male"
+      },
+    },
+    "required": ["name", "gender"],
+    "x-form-schema": {
+      "angular": "message.human.angular"
+    }
+  },
+  "robot": {
+    "type": "object",
+    "title": "Robot",
+    "properties": {
+      "name":  {
+        "title": "Name",
+        "type": "string"
+      },
+      "serialNumber":  {
+        "title": "Serial Number",
+        "type": "string"
+      }
+    },
+    "required": ["name", "serialNumber"],
+    "x-form-schema": {
+      "angular": "message.robot.angular"
+    }
+  }
+}
