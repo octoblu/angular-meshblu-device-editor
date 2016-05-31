@@ -335,10 +335,8 @@
       if (this.scope.formSchemas == null) {
         return;
       }
-      console.log('dereference');
       return $RefParser.dereference(this.scope.formSchemas, (function(_this) {
         return function(error, formSchemas) {
-          console.log('resolved', formSchemas);
           _this.scope.errorFormSchema = error;
           _this.scope.resolvedFormSchemas = formSchemas;
           return _this.scope.$apply();
