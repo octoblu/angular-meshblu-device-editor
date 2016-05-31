@@ -254,6 +254,7 @@
 
   MessageSchemaContainer = (function() {
     function MessageSchemaContainer(scope) {
+      var base;
       this.scope = scope;
       this.setAvailableSchemas = bind(this.setAvailableSchemas, this);
       this.resolveSchemas = bind(this.resolveSchemas, this);
@@ -263,6 +264,9 @@
       this.schema = bind(this.schema, this);
       this.formSchema = bind(this.formSchema, this);
       this.availableSchemas = bind(this.availableSchemas, this);
+      if ((base = this.scope).formSchemas == null) {
+        base.formSchemas = {};
+      }
       this.scope.$watch('schemas', this.resolveSchemas);
       this.scope.$watch('formSchemas', this.resolveFormSchemas);
       this.scope.$watch('resolvedSchemas', this.setAvailableSchemas);
@@ -328,8 +332,13 @@
     };
 
     MessageSchemaContainer.prototype.resolveFormSchemas = function() {
+      if (this.scope.formSchemas == null) {
+        return;
+      }
+      console.log('dereference');
       return $RefParser.dereference(this.scope.formSchemas, (function(_this) {
         return function(error, formSchemas) {
+          console.log('resolved', formSchemas);
           _this.scope.errorFormSchema = error;
           _this.scope.resolvedFormSchemas = formSchemas;
           return _this.scope.$apply();
@@ -338,6 +347,9 @@
     };
 
     MessageSchemaContainer.prototype.resolveSchemas = function() {
+      if (this.scope.schemas == null) {
+        return;
+      }
       return $RefParser.dereference(this.scope.schemas, (function(_this) {
         return function(error, schemas) {
           _this.scope.errorSchema = error;
@@ -373,7 +385,7 @@
       replace: true,
       controller: 'MessageSchemaContainer',
       scope: {
-        formSchemas: '=',
+        formSchemas: '=?',
         message: '=',
         schemas: '=',
         selectedSchemaKey: '='

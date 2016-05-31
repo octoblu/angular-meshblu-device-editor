@@ -1,6 +1,6 @@
 <div>
-  <div class="alert alert-danger" ng-if="!errorFormSchema">Error resolving form schema</div>
-  <div class="alert alert-danger" ng-if="!errorSchema">Error resolving message schema</div>
+  <div class="alert alert-danger" ng-show="errorFormSchema">Error resolving form schema</div>
+  <div class="alert alert-danger" ng-show="errorSchema">Error resolving message schema</div>
 
   <div class="form-group" ng-hide="availableSchemas.length == 1 || errorSchema || errorFormSchema">
     <label class="control-label" for="selected-schema-key">Message Type</label>

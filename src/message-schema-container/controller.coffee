@@ -2,6 +2,7 @@
 
 class MessageSchemaContainer
   constructor: (@scope) ->
+    @scope.formSchemas ?= {}
     @scope.$watch 'schemas', @resolveSchemas
     @scope.$watch 'formSchemas', @resolveFormSchemas
     @scope.$watch 'resolvedSchemas', @setAvailableSchemas
@@ -40,7 +41,9 @@ class MessageSchemaContainer
 
   resolveFormSchemas: =>
     return unless @scope.formSchemas?
+    console.log 'dereference'
     $RefParser.dereference @scope.formSchemas, (error, formSchemas) =>
+      console.log 'resolved', formSchemas
       @scope.errorFormSchema = error
       @scope.resolvedFormSchemas = formSchemas
       @scope.$apply()

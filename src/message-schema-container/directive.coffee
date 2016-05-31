@@ -7,7 +7,7 @@ window
   replace: true
   controller: 'MessageSchemaContainer'
   scope:
-    formSchemas: '='
+    formSchemas: '=?'
     message: '='
     schemas: '='
     selectedSchemaKey: '='
