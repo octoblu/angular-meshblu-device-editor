@@ -89,6 +89,14 @@ angular.module('example').controller('ExampleDeviceMessageSchemaContainerControl
   this.selectedSchemaKey = 'robot'
 });
 
+angular.module('example').controller('ExampleV2DeviceMessageSchemaContainerController', function(){
+  var device = angular.copy(DEVICE);
+  device.schemas.version = '2.0.0';
+  this.message = {};
+  this.device = device;
+  this.selectedSchemaKey = 'robot'
+});
+
 angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerController', ['$timeout', function($timeout){
   var self = this;
 
