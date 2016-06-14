@@ -247,10 +247,10 @@
 }).call(this);
 
 (function() {
-  var $RefParser, MessageSchemaContainer, _,
+  var $RefParser, MessageSchemaContainer, _, angular,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  _ = window._, $RefParser = window.$RefParser;
+  _ = window._, angular = window.angular, $RefParser = window.$RefParser;
 
   MessageSchemaContainer = (function() {
     function MessageSchemaContainer(scope) {
@@ -279,7 +279,7 @@
           _this.scope.schema = _this.schema();
           _this.scope.formSchema = _this.formSchema();
           if (theNew !== theOld) {
-            return _this.scope.message = {};
+            return angular.copy({}, _this.scope.message);
           }
         };
       })(this));
@@ -311,6 +311,8 @@
       if (key == null) {
         return ['*'];
       }
+      console.log('key', key);
+      console.log('resolvedFormSchemas', JSON.stringify(this.scope.resolvedFormSchemas));
       formSchema = _.get(this.scope.resolvedFormSchemas, key);
       return formSchema;
     };

@@ -1,4 +1,4 @@
-{_, $RefParser} = window
+{_, angular, $RefParser} = window
 
 class MessageSchemaContainer
   constructor: (@scope) ->
@@ -11,7 +11,7 @@ class MessageSchemaContainer
       return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
       @scope.schema  = @schema()
       @scope.formSchema = @formSchema()
-      @scope.message = {} unless theNew == theOld
+      angular.copy({}, @scope.message) unless theNew == theOld
 
   availableSchemas: =>
     _.compact @schemaKeys().map (key) =>
@@ -26,6 +26,9 @@ class MessageSchemaContainer
     schema = @schema()
     key = schema?['x-form-schema']?.angular
     return ['*'] unless key?
+    console.log 'key', key
+    console.log 'resolvedFormSchemas', JSON.stringify @scope.resolvedFormSchemas
+
     formSchema = _.get @scope.resolvedFormSchemas, key
     return formSchema
 
