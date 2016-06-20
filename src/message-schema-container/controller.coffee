@@ -26,8 +26,6 @@ class MessageSchemaContainer
     schema = @schema()
     key = schema?['x-form-schema']?.angular
     return ['*'] unless key?
-    console.log 'key', key
-    console.log 'resolvedFormSchemas', JSON.stringify @scope.resolvedFormSchemas
 
     formSchema = _.get @scope.resolvedFormSchemas, key
     return formSchema
