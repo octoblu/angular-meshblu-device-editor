@@ -3,21 +3,31 @@ angular.module('example', ['angular-meshblu-device-editor']);
 
 var DEVICE = {
   schemas: {
-    version: '1.0.0',
+    version: '2.0.0',
     form: {
       configure: {
-        human: {
+        "advanced-config": {
           angular: ['*']
         },
-        robot: {
+        "default": {
           angular: ['*']
         }
       }
     },
     configure: {
-      type: "object",
-      properties: {
-        options: {
+      "default": {
+        title: "Default",
+        type: "object",
+        properties: {
+        },
+        'x-form-schema': {
+          angular: 'configure.default.angular'
+        }
+      },
+      "advanced-config": {
+        title: "Advanced Config",
+        type: "object",
+        properties: {
           human: {
             type: "object",
             title: "Human",
@@ -34,9 +44,6 @@ var DEVICE = {
               },
             },
             required: ["name", "gender"],
-            formSchema: {
-              angular: 'configure.human.angular'
-            }
           },
           robot: {
             type: "object",
@@ -51,11 +58,11 @@ var DEVICE = {
                 type: "string"
               }
             },
-            required: ["name", "serialNumber"],
-            formSchema: {
-              angular: 'configure.robot.angular'
-            }
+            required: ["name", "serialNumber"]
           }
+        },
+        'x-form-schema': {
+          angular: 'configure.advanced-config.angular'
         }
       }
     }
@@ -82,30 +89,16 @@ var OLD_DEVICE = {
   }
 }
 
-angular.module('example').controller('ExampleConfigureSchemaContainerController', function(){
-  this.model = {
-    name: 'Johnny 5'
-  };
-  this.schemas = angular.copy(DEVICE.schemas.configure);
-  this.model = {
+angular.module('example').controller('ExampleConfigureSchemaContainerController', function($timeout){
+  var self = this;
+  self.model = {
     schemas: {
       selected: {
-        configure: 'robot'
+        configure: 'advanced-config'
       }
     }
   };
-});
-
-angular.module('example').controller('ExampleDeviceConfigureSchemaContainerController', function(){
-  this.model = {};
-  this.device = angular.copy(DEVICE);
-  this.model = {
-    schemas: {
-      selected: {
-        configure: 'robot'
-      }
-    }
-  };
+  self.device = angular.copy(DEVICE);
 });
 
 angular.module('example').controller('ExampleOldDeviceConfigureSchemaContainerController', ['$timeout', function($timeout){

@@ -52,6 +52,12 @@ var DEVICE = {
         'x-form-schema': {
           angular: 'message.robot.angular'
         }
+      },
+      nothing: {
+        type: "object",
+        title: "Nothing",
+        properties: {
+        }
       }
     }
   }

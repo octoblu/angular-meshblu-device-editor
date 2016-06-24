@@ -9,8 +9,9 @@ class MessageSchemaContainer
     @scope.$watch 'resolvedFormSchemas', @setAvailableSchemas
     @scope.$watch 'selectedSchemaKey', (theNew, theOld) =>
       return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
-      @scope.schema  = @schema()
+      @scope.schema = @schema()
       @scope.formSchema = @formSchema()
+      @scope.isEmpty = @isEmpty()
       angular.copy({}, @scope.message) unless theNew == theOld
 
   availableSchemas: =>
@@ -29,6 +30,10 @@ class MessageSchemaContainer
 
     formSchema = _.get @scope.resolvedFormSchemas, key
     return formSchema
+
+  isEmpty: =>
+    return true if @scope.schema?.type == 'object' && _.isEmpty @scope.schema?.properties
+    return false
 
   schema: =>
     @scope.resolvedSchemas?[@scope.selectedSchemaKey]
@@ -60,6 +65,7 @@ class MessageSchemaContainer
     @scope.selectedSchemaKey = @selectedSchemaKey()
     @scope.schema = @schema()
     @scope.formSchema = @formSchema()
+    @scope.isEmpty = @isEmpty()
 
 window
 .angular

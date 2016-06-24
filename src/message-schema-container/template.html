@@ -11,5 +11,7 @@
       class="form-control" ></select>
   </div>
 
-  <form sf-schema="schema" sf-form="formSchema" sf-model="message"></form>
+  <div ng-if="!isEmpty">
+    <form sf-schema="schema" sf-form="formSchema" sf-model="message"></form>
+  </div>
 </div>

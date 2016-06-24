@@ -8,110 +8,6 @@
 }).call(this);
 
 (function() {
-  var ConfigureSchemaContainer, _,
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  _ = window._;
-
-  ConfigureSchemaContainer = (function() {
-    function ConfigureSchemaContainer(scope) {
-      this.scope = scope;
-      this.setAvailableSchemas = bind(this.setAvailableSchemas, this);
-      this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
-      this.schemaKeys = bind(this.schemaKeys, this);
-      this.schema = bind(this.schema, this);
-      this.formSchema = bind(this.formSchema, this);
-      this.availableSchemas = bind(this.availableSchemas, this);
-      this.scope.$watch('schemas', this.setAvailableSchemas);
-      this.scope.$watch('model.schemas.selected.configure', (function(_this) {
-        return function(theNew, theOld) {
-          _this.scope.schema = _this.schema();
-          return _this.scope.formSchema = _this.formSchema();
-        };
-      })(this));
-    }
-
-    ConfigureSchemaContainer.prototype.availableSchemas = function() {
-      return _.compact(this.schemaKeys().map((function(_this) {
-        return function(key) {
-          var group, ref, ref1, schema, title;
-          schema = (ref = _this.scope.schemas) != null ? ref[key] : void 0;
-          if (schema == null) {
-            return;
-          }
-          title = (ref1 = schema.title) != null ? ref1 : key;
-          group = schema['x-group-name'];
-          return {
-            key: key,
-            title: title,
-            group: group
-          };
-        };
-      })(this)));
-    };
-
-    ConfigureSchemaContainer.prototype.formSchema = function() {
-      var formSchema, key, ref, schema;
-      schema = this.schema();
-      key = schema != null ? (ref = schema['x-form-schema']) != null ? ref.angular : void 0 : void 0;
-      if (key == null) {
-        return ['*'];
-      }
-      formSchema = _.get(this.scope.formSchemas, key);
-      return formSchema;
-    };
-
-    ConfigureSchemaContainer.prototype.schema = function() {
-      var ref;
-      return (ref = this.scope.schemas) != null ? ref[_.get(this.scope.model, 'schemas.selected.configure')] : void 0;
-    };
-
-    ConfigureSchemaContainer.prototype.schemaKeys = function() {
-      return _.keys(this.scope.schemas);
-    };
-
-    ConfigureSchemaContainer.prototype.selectedSchemaKey = function() {
-      var selectedSchemaKey;
-      selectedSchemaKey = _.get(this.scope.model, 'schemas.selected.configure');
-      if (selectedSchemaKey) {
-        return selectedSchemaKey;
-      }
-      return _.first(this.schemaKeys());
-    };
-
-    ConfigureSchemaContainer.prototype.setAvailableSchemas = function() {
-      this.scope.availableSchemas = this.availableSchemas();
-      _.set(this.scope.model, 'schemas.selected.configure', this.selectedSchemaKey());
-      this.scope.schema = this.schema();
-      return this.scope.formSchema = this.formSchema();
-    };
-
-    return ConfigureSchemaContainer;
-
-  })();
-
-  window.angular.module('angular-meshblu-device-editor').controller('ConfigureSchemaContainer', ['$scope', ConfigureSchemaContainer]);
-
-}).call(this);
-
-(function() {
-  window.angular.module('angular-meshblu-device-editor').directive('configureSchemaContainer', function() {
-    return {
-      restrict: 'E',
-      templateUrl: 'configure-schema-container/template.html',
-      replace: true,
-      controller: 'ConfigureSchemaContainer',
-      scope: {
-        formSchemas: '=',
-        model: '=',
-        schemas: '='
-      }
-    };
-  });
-
-}).call(this);
-
-(function() {
   var DeviceConfigureSchemaContainer, OctobluDeviceSchemaTransmogrifier, _,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -172,6 +68,166 @@
       scope: {
         device: '=',
         model: '='
+      }
+    };
+  });
+
+}).call(this);
+
+(function() {
+  var ConfigureSchemaContainer, _,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  _ = window._;
+
+  ConfigureSchemaContainer = (function() {
+    function ConfigureSchemaContainer(scope) {
+      this.scope = scope;
+      this.setAvailableSchemas = bind(this.setAvailableSchemas, this);
+      this.resolveSchemas = bind(this.resolveSchemas, this);
+      this.resolveFormSchemas = bind(this.resolveFormSchemas, this);
+      this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
+      this.getSelected = bind(this.getSelected, this);
+      this.schemaKeys = bind(this.schemaKeys, this);
+      this.schema = bind(this.schema, this);
+      this.isEmpty = bind(this.isEmpty, this);
+      this.formSchema = bind(this.formSchema, this);
+      this.availableSchemas = bind(this.availableSchemas, this);
+      this.scope.$watch('schemas', this.resolveSchemas);
+      this.scope.$watch('formSchemas', this.resolveFormSchemas);
+      this.scope.$watch('resolvedSchemas', this.setAvailableSchemas);
+      this.scope.$watch('resolvedFormSchemas', this.setAvailableSchemas);
+      this.scope.$watch('model.schemas.selected.configure', (function(_this) {
+        return function(theNew, theOld) {
+          if (!((_this.scope.resolvedSchemas != null) && (_this.scope.resolvedFormSchemas != null))) {
+            return;
+          }
+          _this.scope.schema = _this.schema();
+          _this.scope.formSchema = _this.formSchema();
+          return _this.scope.isEmpty = _this.isEmpty();
+        };
+      })(this));
+    }
+
+    ConfigureSchemaContainer.prototype.availableSchemas = function() {
+      return _.compact(this.schemaKeys().map((function(_this) {
+        return function(key) {
+          var group, ref, ref1, schema, title;
+          schema = (ref = _this.scope.resolvedSchemas) != null ? ref[key] : void 0;
+          if (schema == null) {
+            return;
+          }
+          title = (ref1 = schema.title) != null ? ref1 : key;
+          group = schema['x-group-name'];
+          return {
+            key: key,
+            title: title,
+            group: group
+          };
+        };
+      })(this)));
+    };
+
+    ConfigureSchemaContainer.prototype.formSchema = function() {
+      var key, ref, schema;
+      schema = this.schema();
+      key = schema != null ? (ref = schema['x-form-schema']) != null ? ref.angular : void 0 : void 0;
+      if (key == null) {
+        return ['*'];
+      }
+      return _.get(this.scope.resolvedFormSchemas, key);
+    };
+
+    ConfigureSchemaContainer.prototype.isEmpty = function() {
+      var ref, ref1;
+      if (((ref = this.scope.schema) != null ? ref.type : void 0) === 'object' && _.isEmpty((ref1 = this.scope.schema) != null ? ref1.properties : void 0)) {
+        return true;
+      }
+      return false;
+    };
+
+    ConfigureSchemaContainer.prototype.schema = function() {
+      var ref, selectedSchemaKey;
+      selectedSchemaKey = this.getSelected();
+      return (ref = this.scope.resolvedSchemas) != null ? ref[selectedSchemaKey] : void 0;
+    };
+
+    ConfigureSchemaContainer.prototype.schemaKeys = function() {
+      return _.keys(this.scope.resolvedSchemas);
+    };
+
+    ConfigureSchemaContainer.prototype.getSelected = function() {
+      return _.get(this.scope.model, 'schemas.selected.configure');
+    };
+
+    ConfigureSchemaContainer.prototype.selectedSchemaKey = function() {
+      var selectedSchemaKey;
+      selectedSchemaKey = this.getSelected();
+      if (selectedSchemaKey) {
+        return selectedSchemaKey;
+      }
+      return _.first(this.schemaKeys());
+    };
+
+    ConfigureSchemaContainer.prototype.resolveFormSchemas = function() {
+      console.log('formSchemas', this.scope.formSchemas);
+      if (this.scope.formSchemas == null) {
+        return;
+      }
+      return $RefParser.dereference(this.scope.formSchemas, (function(_this) {
+        return function(error, formSchemas) {
+          console.log('formSchemas', formSchemas);
+          _this.scope.errorFormSchema = error;
+          _this.scope.resolvedFormSchemas = formSchemas;
+          return _this.scope.$apply();
+        };
+      })(this));
+    };
+
+    ConfigureSchemaContainer.prototype.resolveSchemas = function() {
+      if (this.scope.schemas == null) {
+        return;
+      }
+      return $RefParser.dereference(this.scope.schemas, (function(_this) {
+        return function(error, schemas) {
+          console.log('schemas', schemas);
+          _this.scope.errorSchema = error;
+          _this.scope.resolvedSchemas = schemas;
+          return _this.scope.$apply();
+        };
+      })(this));
+    };
+
+    ConfigureSchemaContainer.prototype.setAvailableSchemas = function() {
+      if (!((this.scope.resolvedSchemas != null) && (this.scope.resolvedFormSchemas != null))) {
+        return;
+      }
+      this.scope.availableSchemas = this.availableSchemas();
+      _.set(this.scope.model, 'schemas.selected.configure', this.selectedSchemaKey());
+      this.scope.schema = this.schema();
+      this.scope.formSchema = this.formSchema();
+      return this.scope.isEmpty = this.isEmpty();
+    };
+
+    return ConfigureSchemaContainer;
+
+  })();
+
+  window.angular.module('angular-meshblu-device-editor').controller('ConfigureSchemaContainer', ['$scope', ConfigureSchemaContainer]);
+
+}).call(this);
+
+(function() {
+  window.angular.module('angular-meshblu-device-editor').directive('configureSchemaContainer', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'configure-schema-container/template.html',
+      replace: true,
+      controller: 'ConfigureSchemaContainer',
+      scope: {
+        formSchemas: '=',
+        model: '=',
+        schemas: '='
       }
     };
   });
@@ -262,6 +318,7 @@
       this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
       this.schemaKeys = bind(this.schemaKeys, this);
       this.schema = bind(this.schema, this);
+      this.isEmpty = bind(this.isEmpty, this);
       this.formSchema = bind(this.formSchema, this);
       this.availableSchemas = bind(this.availableSchemas, this);
       if ((base = this.scope).formSchemas == null) {
@@ -278,6 +335,7 @@
           }
           _this.scope.schema = _this.schema();
           _this.scope.formSchema = _this.formSchema();
+          _this.scope.isEmpty = _this.isEmpty();
           if (theNew !== theOld) {
             return angular.copy({}, _this.scope.message);
           }
@@ -311,10 +369,16 @@
       if (key == null) {
         return ['*'];
       }
-      console.log('key', key);
-      console.log('resolvedFormSchemas', JSON.stringify(this.scope.resolvedFormSchemas));
       formSchema = _.get(this.scope.resolvedFormSchemas, key);
       return formSchema;
+    };
+
+    MessageSchemaContainer.prototype.isEmpty = function() {
+      var ref, ref1;
+      if (((ref = this.scope.schema) != null ? ref.type : void 0) === 'object' && _.isEmpty((ref1 = this.scope.schema) != null ? ref1.properties : void 0)) {
+        return true;
+      }
+      return false;
     };
 
     MessageSchemaContainer.prototype.schema = function() {
@@ -366,7 +430,8 @@
       this.scope.availableSchemas = this.availableSchemas();
       this.scope.selectedSchemaKey = this.selectedSchemaKey();
       this.scope.schema = this.schema();
-      return this.scope.formSchema = this.formSchema();
+      this.scope.formSchema = this.formSchema();
+      return this.scope.isEmpty = this.isEmpty();
     };
 
     return MessageSchemaContainer;
