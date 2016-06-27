@@ -1,0 +1,27 @@
+{
+  "message": {
+    "human": {
+      "angular": [
+        {
+          "title": "Name",
+          "key": "name"
+        },
+        {
+          "title": "Gender",
+          "key": "gender",
+          "type": "radios"
+        }
+      ]
+    },
+    "robot": {
+      "angular": [
+        {
+          "key": "name"
+        },
+        {
+          "key": "serialNumber"
+        }
+      ]
+    }
+  }
+}

@@ -7,7 +7,7 @@ window
   replace: true
   controller: 'ConfigureSchemaContainer'
   scope:
-    formSchemas: '='
+    formSchemas: '=?'
     model: '='
     schemas: '='
 }

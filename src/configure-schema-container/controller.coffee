@@ -1,7 +1,8 @@
-{_} = window
+{_, angular, $RefParser} = window
 
 class ConfigureSchemaContainer
   constructor: (@scope) ->
+    @scope.formSchemas ?= {}
     @scope.$watch 'schemas', @resolveSchemas
     @scope.$watch 'formSchemas', @resolveFormSchemas
     @scope.$watch 'resolvedSchemas', @setAvailableSchemas
@@ -47,10 +48,8 @@ class ConfigureSchemaContainer
     _.first @schemaKeys()
 
   resolveFormSchemas: =>
-    console.log 'formSchemas', @scope.formSchemas
     return unless @scope.formSchemas?
     $RefParser.dereference @scope.formSchemas, (error, formSchemas) =>
-      console.log 'formSchemas', formSchemas
       @scope.errorFormSchema = error
       @scope.resolvedFormSchemas = formSchemas
       @scope.$apply()
@@ -58,7 +57,6 @@ class ConfigureSchemaContainer
   resolveSchemas: =>
     return unless @scope.schemas?
     $RefParser.dereference @scope.schemas, (error, schemas) =>
-      console.log 'schemas', schemas
       @scope.errorSchema = error
       @scope.resolvedSchemas = schemas
       @scope.$apply()

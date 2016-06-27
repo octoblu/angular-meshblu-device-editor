@@ -14,21 +14,18 @@
         formSchemas="controller.formSchemas"></configure-schema-container>
 
       <h3>Selected Schema: "{{controller.model.schemas.selected.configure}}"</h3>
-      <pre>{{controller.formSchemas | json}}</pre>
     </section>
 
     <hr>
-
     <section ng-controller="ExampleEmptyConfigureSchemaContainerController as controller">
       <h1>Empty Configure Schema Container</h1>
 
       <configure-schema-container
-        schemas="controller.schemas"
         model="controller.model"
+        schemas="controller.schemas"
         formSchemas="controller.formSchemas"></configure-schema-container>
 
       <h3>Selected Schema: "{{controller.model.schemas.selected.configure}}"</h3>
-      <pre>{{controller.model | json}}</pre>
     </section>
 
     <script src="../../../dist/dependencies.js"></script>

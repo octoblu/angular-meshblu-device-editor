@@ -2,8 +2,6 @@
 angular.module('example', ['angular-meshblu-device-editor']);
 
 angular.module('example').controller('ExampleConfigureSchemaContainerController', function($timeout){
-  this.model = {
-  };
   this.schemas = {
     "default": {
       title: "Default",
@@ -36,23 +34,22 @@ angular.module('example').controller('ExampleConfigureSchemaContainerController'
     }
   }
   this.formSchemas = {
-    "advanced-config": {
-      angular: ['*']
-    },
-    "default": {
-      angular: ['*']
-    }
-  };
-  var self = this;
-  $timeout(function(){
-    self.model = {
-      schemas: {
-        selected: {
-          configure: 'advanced-config'
-        }
+    "configure": {
+      "advanced-config": {
+        angular: ['*']
+      },
+      "default": {
+        angular: ['*']
       }
     }
-  }, 100)
+  };
+  this.model = {
+    schemas: {
+      selected: {
+        configure: 'advanced-config'
+      }
+    }
+  }
 });
 
 angular.module('example').controller('ExampleEmptyConfigureSchemaContainerController', function(){
