@@ -8,10 +8,10 @@
 }).call(this);
 
 (function() {
-  var $RefParser, ConfigureSchemaContainer, _, angular,
+  var ConfigureSchemaContainer, MeshbluJsonSchemaResolver, _, angular,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  _ = window._, angular = window.angular, $RefParser = window.$RefParser;
+  _ = window._, angular = window.angular, MeshbluJsonSchemaResolver = window.MeshbluJsonSchemaResolver;
 
   ConfigureSchemaContainer = (function() {
     function ConfigureSchemaContainer(scope) {
@@ -27,6 +27,9 @@
       this.isEmpty = bind(this.isEmpty, this);
       this.formSchema = bind(this.formSchema, this);
       this.availableSchemas = bind(this.availableSchemas, this);
+      this.meshbluJsonSchemaResolver = new MeshbluJsonSchemaResolver({
+        meshbluConfig: this.scope.meshbluConfig
+      });
       if ((base = this.scope).formSchemas == null) {
         base.formSchemas = {};
       }
@@ -110,7 +113,7 @@
       if (this.scope.formSchemas == null) {
         return;
       }
-      return $RefParser.dereference(this.scope.formSchemas, (function(_this) {
+      return this.meshbluJsonSchemaResolver.resolve(this.scope.formSchemas, (function(_this) {
         return function(error, formSchemas) {
           _this.scope.errorFormSchema = error;
           _this.scope.resolvedFormSchemas = formSchemas;
@@ -123,7 +126,7 @@
       if (this.scope.schemas == null) {
         return;
       }
-      return $RefParser.dereference(this.scope.schemas, (function(_this) {
+      return this.meshbluJsonSchemaResolver.resolve(this.scope.schemas, (function(_this) {
         return function(error, schemas) {
           _this.scope.errorSchema = error;
           _this.scope.resolvedSchemas = schemas;
@@ -161,7 +164,8 @@
       scope: {
         formSchemas: '=?',
         model: '=',
-        schemas: '='
+        schemas: '=',
+        meshbluConfig: '='
       }
     };
   });

@@ -10,4 +10,5 @@ window
     formSchemas: '=?'
     model: '='
     schemas: '='
+    meshbluConfig: '='
 }
