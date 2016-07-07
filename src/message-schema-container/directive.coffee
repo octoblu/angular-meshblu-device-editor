@@ -11,4 +11,5 @@ window
     message: '='
     schemas: '='
     selectedSchemaKey: '='
+    meshbluConfig: '='
 }

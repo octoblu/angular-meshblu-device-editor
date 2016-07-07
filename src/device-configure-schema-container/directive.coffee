@@ -9,4 +9,5 @@ window
   scope:
     device: '='
     model: '='
+    meshbluConfig: '='
 }

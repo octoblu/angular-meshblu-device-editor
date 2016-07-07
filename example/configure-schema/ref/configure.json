@@ -36,6 +36,9 @@
         "type": "string",
         "enum": ["DestroyHumans"],
         "default": "DestroyHumans"
+      },
+      "meshbluDevice": {
+        "$ref": "meshbludevice://3d4697a8-7710-4cca-9474-2785d7a3e7cd/#/messageSchema"
       }
     },
     "required": ["name", "serialNumber"],

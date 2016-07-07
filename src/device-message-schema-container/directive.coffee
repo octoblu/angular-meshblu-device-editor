@@ -10,4 +10,5 @@ window
     device: '='
     message: '='
     selectedSchemaKey: '='
+    meshbluConfig: '='
 }

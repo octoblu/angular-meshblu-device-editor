@@ -232,7 +232,8 @@
       controller: 'DeviceConfigureSchemaContainer',
       scope: {
         device: '=',
-        model: '='
+        model: '=',
+        meshbluConfig: '='
       }
     };
   });
@@ -300,7 +301,8 @@
       scope: {
         device: '=',
         message: '=',
-        selectedSchemaKey: '='
+        selectedSchemaKey: '=',
+        meshbluConfig: '='
       }
     };
   });
@@ -308,10 +310,10 @@
 }).call(this);
 
 (function() {
-  var $RefParser, MessageSchemaContainer, _, angular,
+  var MeshbluJsonSchemaResolver, MessageSchemaContainer, _, angular,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  _ = window._, angular = window.angular, $RefParser = window.$RefParser;
+  _ = window._, angular = window.angular, MeshbluJsonSchemaResolver = window.MeshbluJsonSchemaResolver;
 
   MessageSchemaContainer = (function() {
     function MessageSchemaContainer(scope) {
@@ -326,6 +328,9 @@
       this.isEmpty = bind(this.isEmpty, this);
       this.formSchema = bind(this.formSchema, this);
       this.availableSchemas = bind(this.availableSchemas, this);
+      this.meshbluJsonSchemaResolver = new MeshbluJsonSchemaResolver({
+        meshbluConfig: this.scope.meshbluConfig
+      });
       if ((base = this.scope).formSchemas == null) {
         base.formSchemas = {};
       }
@@ -406,7 +411,7 @@
       if (this.scope.formSchemas == null) {
         return;
       }
-      return $RefParser.dereference(this.scope.formSchemas, (function(_this) {
+      return this.meshbluJsonSchemaResolver.resolve(this.scope.formSchemas, (function(_this) {
         return function(error, formSchemas) {
           _this.scope.errorFormSchema = error;
           _this.scope.resolvedFormSchemas = formSchemas;
@@ -419,7 +424,7 @@
       if (this.scope.schemas == null) {
         return;
       }
-      return $RefParser.dereference(this.scope.schemas, (function(_this) {
+      return this.meshbluJsonSchemaResolver.resolve(this.scope.schemas, (function(_this) {
         return function(error, schemas) {
           _this.scope.errorSchema = error;
           _this.scope.resolvedSchemas = schemas;
@@ -458,7 +463,8 @@
         formSchemas: '=?',
         message: '=',
         schemas: '=',
-        selectedSchemaKey: '='
+        selectedSchemaKey: '=',
+        meshbluConfig: '='
       }
     };
   });
@@ -466,6 +472,6 @@
 }).call(this);
 
 angular.module("angular-meshblu-device-editor").run(["$templateCache", function($templateCache) {$templateCache.put("configure-schema-container/template.html","<div>\n  <div class=\"alert alert-danger\" ng-show=\"errorFormSchema\">Error resolving form schema</div>\n  <div class=\"alert alert-danger\" ng-show=\"errorSchema\">Error resolving configure schema</div>\n\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1 || errorSchema || errorFormSchema\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Configure Type</label>\n    <select\n      ng-options=\"option.key as option.title group by option.group for option in availableSchemas\"\n      ng-model=\"model.schemas.selected.configure\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n  <div ng-if=\"!isEmpty\">\n    <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"model\"></form>\n  </div>\n</div>\n");
-$templateCache.put("device-configure-schema-container/template.html","<div>\n  <h4 ng-hide=\"hasSchemas\"><small>Device does not contain a configure schema.</small></h4>\n\n  <configure-schema-container\n    ng-show=\"hasSchemas\"\n    model=\"model\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"></configure-schema-container>\n</div>\n");
-$templateCache.put("device-message-schema-container/template.html","<div>\n  <h4 ng-hide=\"hasSchemas\"><small>Device does not contain a message schema.</small></h4>\n\n  <message-schema-container\n    ng-show=\"hasSchemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
+$templateCache.put("device-configure-schema-container/template.html","<div>\n  <h4 ng-hide=\"hasSchemas\"><small>Device does not contain a configure schema.</small></h4>\n\n  <configure-schema-container\n    ng-show=\"hasSchemas\"\n    model=\"model\"\n    schemas=\"schemas\"\n    meshblu-config=\"meshbluConfig\"\n    form-schemas=\"formSchemas\"></configure-schema-container>\n</div>\n");
+$templateCache.put("device-message-schema-container/template.html","<div>\n  <h4 ng-hide=\"hasSchemas\"><small>Device does not contain a message schema.</small></h4>\n\n  <message-schema-container\n    ng-show=\"hasSchemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    meshblu-config=\"meshbluConfig\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
 $templateCache.put("message-schema-container/template.html","<div>\n  <div class=\"alert alert-danger\" ng-show=\"errorFormSchema\">Error resolving form schema</div>\n  <div class=\"alert alert-danger\" ng-show=\"errorSchema\">Error resolving message schema</div>\n\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1 || errorSchema || errorFormSchema\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Message Type</label>\n    <select\n      ng-options=\"option.key as option.title group by option.group for option in availableSchemas\"\n      ng-model=\"selectedSchemaKey\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <div ng-if=\"!isEmpty\">\n    <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n  </div>\n</div>\n");}]);
