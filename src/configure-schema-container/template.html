@@ -5,10 +5,10 @@
   <div class="form-group" ng-hide="availableSchemas.length == 1 || errorSchema || errorFormSchema">
     <label class="control-label" for="selected-schema-key">Configure Type</label>
     <select
-      ng-options="option.key as option.title group by option.group for option in availableSchemas"
-      ng-model="draft.schemas.selected.configure"
+      ng-options="option.title group by option.group for option in availableSchemas track by option.key"
+      ng-model="selectedSchema"
       name="selected-schema-key"
-      class="form-control" ></select>
+      class="form-control"></select>
   </div>
   <div ng-if="!isEmpty">
     <form sf-schema="schema" sf-form="formSchema" sf-model="model"></form>

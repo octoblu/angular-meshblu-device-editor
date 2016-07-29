@@ -4,20 +4,19 @@ class ConfigureSchemaContainer
   constructor: (@scope) ->
     @meshbluJsonSchemaResolver = new MeshbluJsonSchemaResolver {meshbluConfig: @scope.meshbluConfig}
     @scope.formSchemas ?= {}
-    @scope.draft = _.cloneDeep @scope.model
     @scope.$watch 'schemas', @resolveSchemas
     @scope.$watch 'formSchemas', @resolveFormSchemas
     @scope.$watch 'resolvedSchemas', @setAvailableSchemas
     @scope.$watch 'resolvedFormSchemas', @setAvailableSchemas
-    @scope.$watch 'draft.schemas.selected.configure', (theNew, theOld) =>
-      return if _.get(@scope.draft, 'schemas.selected.configure') == _.get(@scope.model, 'schemas.selected.configure')
+    @scope.$watch 'selectedSchema', (theNew, theOld) =>
+      return if @scope.selectedSchema?.key == _.get(@scope.model, 'schemas.selected.configure')
       return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
       confirmChangeFn = @scope.confirmSchemaChangeFn ? @_defaultConfirmSchemaChange
       confirmChangeFn (confirmed) =>
         unless confirmed
-          _.set @scope.draft, 'schemas.selected.configure', theOld
+          @scope.selectedSchema = theOld
           return
-        _.set @scope.model, 'schemas.selected.configure', theNew
+        _.set @scope.model, 'schemas.selected.configure', theNew?.key
         @scope.schema = @schema()
         @scope.formSchema = @formSchema()
         @scope.isEmpty = @isEmpty()
@@ -75,6 +74,7 @@ class ConfigureSchemaContainer
   setAvailableSchemas: =>
     return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
     @scope.availableSchemas  = @availableSchemas()
+    @scope.selectedSchema = _.findWhere @scope.availableSchemas, key: @selectedSchemaKey()
     _.set @scope.model, 'schemas.selected.configure', @selectedSchemaKey()
     @scope.schema = @schema()
     @scope.formSchema = @formSchema()
