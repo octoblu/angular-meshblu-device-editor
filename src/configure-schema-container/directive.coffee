@@ -11,4 +11,5 @@ window
     model: '='
     schemas: '='
     meshbluConfig: '='
+    confirmSchemaChangeFn: '='
 }

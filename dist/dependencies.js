@@ -27834,7 +27834,7 @@ return tv4; // used by _header.js to globalise.
 
 }));
 /**
- * @license AngularJS v1.5.7
+ * @license AngularJS v1.5.8
  * (c) 2010-2016 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -27852,6 +27852,14 @@ return tv4; // used by _header.js to globalise.
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 var $sanitizeMinErr = angular.$$minErr('$sanitize');
+var bind;
+var extend;
+var forEach;
+var isDefined;
+var lowercase;
+var noop;
+var htmlParser;
+var htmlSanitizeWriter;
 
 /**
  * @ngdoc module
@@ -27984,7 +27992,7 @@ function $SanitizeProvider() {
 
   this.$get = ['$$sanitizeUri', function($$sanitizeUri) {
     if (svgEnabled) {
-      angular.extend(validElements, svgElements);
+      extend(validElements, svgElements);
     }
     return function(html) {
       var buf = [];
@@ -28027,333 +28035,343 @@ function $SanitizeProvider() {
    *    without an argument or self for chaining otherwise.
    */
   this.enableSvg = function(enableSvg) {
-    if (angular.isDefined(enableSvg)) {
+    if (isDefined(enableSvg)) {
       svgEnabled = enableSvg;
       return this;
     } else {
       return svgEnabled;
     }
   };
+
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+  // Private stuff
+  //////////////////////////////////////////////////////////////////////////////////////////////////
+
+  bind = angular.bind;
+  extend = angular.extend;
+  forEach = angular.forEach;
+  isDefined = angular.isDefined;
+  lowercase = angular.lowercase;
+  noop = angular.noop;
+
+  htmlParser = htmlParserImpl;
+  htmlSanitizeWriter = htmlSanitizeWriterImpl;
+
+  // Regular Expressions for parsing tags and attributes
+  var SURROGATE_PAIR_REGEXP = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
+    // Match everything outside of normal chars and " (quote character)
+    NON_ALPHANUMERIC_REGEXP = /([^\#-~ |!])/g;
+
+
+  // Good source of info about elements and attributes
+  // http://dev.w3.org/html5/spec/Overview.html#semantics
+  // http://simon.html5.org/html-elements
+
+  // Safe Void Elements - HTML5
+  // http://dev.w3.org/html5/spec/Overview.html#void-elements
+  var voidElements = toMap("area,br,col,hr,img,wbr");
+
+  // Elements that you can, intentionally, leave open (and which close themselves)
+  // http://dev.w3.org/html5/spec/Overview.html#optional-tags
+  var optionalEndTagBlockElements = toMap("colgroup,dd,dt,li,p,tbody,td,tfoot,th,thead,tr"),
+      optionalEndTagInlineElements = toMap("rp,rt"),
+      optionalEndTagElements = extend({},
+                                              optionalEndTagInlineElements,
+                                              optionalEndTagBlockElements);
+
+  // Safe Block Elements - HTML5
+  var blockElements = extend({}, optionalEndTagBlockElements, toMap("address,article," +
+          "aside,blockquote,caption,center,del,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5," +
+          "h6,header,hgroup,hr,ins,map,menu,nav,ol,pre,section,table,ul"));
+
+  // Inline Elements - HTML5
+  var inlineElements = extend({}, optionalEndTagInlineElements, toMap("a,abbr,acronym,b," +
+          "bdi,bdo,big,br,cite,code,del,dfn,em,font,i,img,ins,kbd,label,map,mark,q,ruby,rp,rt,s," +
+          "samp,small,span,strike,strong,sub,sup,time,tt,u,var"));
+
+  // SVG Elements
+  // https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Elements
+  // Note: the elements animate,animateColor,animateMotion,animateTransform,set are intentionally omitted.
+  // They can potentially allow for arbitrary javascript to be executed. See #11290
+  var svgElements = toMap("circle,defs,desc,ellipse,font-face,font-face-name,font-face-src,g,glyph," +
+          "hkern,image,linearGradient,line,marker,metadata,missing-glyph,mpath,path,polygon,polyline," +
+          "radialGradient,rect,stop,svg,switch,text,title,tspan");
+
+  // Blocked Elements (will be stripped)
+  var blockedElements = toMap("script,style");
+
+  var validElements = extend({},
+                                     voidElements,
+                                     blockElements,
+                                     inlineElements,
+                                     optionalEndTagElements);
+
+  //Attributes that have href and hence need to be sanitized
+  var uriAttrs = toMap("background,cite,href,longdesc,src,xlink:href");
+
+  var htmlAttrs = toMap('abbr,align,alt,axis,bgcolor,border,cellpadding,cellspacing,class,clear,' +
+      'color,cols,colspan,compact,coords,dir,face,headers,height,hreflang,hspace,' +
+      'ismap,lang,language,nohref,nowrap,rel,rev,rows,rowspan,rules,' +
+      'scope,scrolling,shape,size,span,start,summary,tabindex,target,title,type,' +
+      'valign,value,vspace,width');
+
+  // SVG attributes (without "id" and "name" attributes)
+  // https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Attributes
+  var svgAttrs = toMap('accent-height,accumulate,additive,alphabetic,arabic-form,ascent,' +
+      'baseProfile,bbox,begin,by,calcMode,cap-height,class,color,color-rendering,content,' +
+      'cx,cy,d,dx,dy,descent,display,dur,end,fill,fill-rule,font-family,font-size,font-stretch,' +
+      'font-style,font-variant,font-weight,from,fx,fy,g1,g2,glyph-name,gradientUnits,hanging,' +
+      'height,horiz-adv-x,horiz-origin-x,ideographic,k,keyPoints,keySplines,keyTimes,lang,' +
+      'marker-end,marker-mid,marker-start,markerHeight,markerUnits,markerWidth,mathematical,' +
+      'max,min,offset,opacity,orient,origin,overline-position,overline-thickness,panose-1,' +
+      'path,pathLength,points,preserveAspectRatio,r,refX,refY,repeatCount,repeatDur,' +
+      'requiredExtensions,requiredFeatures,restart,rotate,rx,ry,slope,stemh,stemv,stop-color,' +
+      'stop-opacity,strikethrough-position,strikethrough-thickness,stroke,stroke-dasharray,' +
+      'stroke-dashoffset,stroke-linecap,stroke-linejoin,stroke-miterlimit,stroke-opacity,' +
+      'stroke-width,systemLanguage,target,text-anchor,to,transform,type,u1,u2,underline-position,' +
+      'underline-thickness,unicode,unicode-range,units-per-em,values,version,viewBox,visibility,' +
+      'width,widths,x,x-height,x1,x2,xlink:actuate,xlink:arcrole,xlink:role,xlink:show,xlink:title,' +
+      'xlink:type,xml:base,xml:lang,xml:space,xmlns,xmlns:xlink,y,y1,y2,zoomAndPan', true);
+
+  var validAttrs = extend({},
+                                  uriAttrs,
+                                  svgAttrs,
+                                  htmlAttrs);
+
+  function toMap(str, lowercaseKeys) {
+    var obj = {}, items = str.split(','), i;
+    for (i = 0; i < items.length; i++) {
+      obj[lowercaseKeys ? lowercase(items[i]) : items[i]] = true;
+    }
+    return obj;
+  }
+
+  var inertBodyElement;
+  (function(window) {
+    var doc;
+    if (window.document && window.document.implementation) {
+      doc = window.document.implementation.createHTMLDocument("inert");
+    } else {
+      throw $sanitizeMinErr('noinert', "Can't create an inert html document");
+    }
+    var docElement = doc.documentElement || doc.getDocumentElement();
+    var bodyElements = docElement.getElementsByTagName('body');
+
+    // usually there should be only one body element in the document, but IE doesn't have any, so we need to create one
+    if (bodyElements.length === 1) {
+      inertBodyElement = bodyElements[0];
+    } else {
+      var html = doc.createElement('html');
+      inertBodyElement = doc.createElement('body');
+      html.appendChild(inertBodyElement);
+      doc.appendChild(html);
+    }
+  })(window);
+
+  /**
+   * @example
+   * htmlParser(htmlString, {
+   *     start: function(tag, attrs) {},
+   *     end: function(tag) {},
+   *     chars: function(text) {},
+   *     comment: function(text) {}
+   * });
+   *
+   * @param {string} html string
+   * @param {object} handler
+   */
+  function htmlParserImpl(html, handler) {
+    if (html === null || html === undefined) {
+      html = '';
+    } else if (typeof html !== 'string') {
+      html = '' + html;
+    }
+    inertBodyElement.innerHTML = html;
+
+    //mXSS protection
+    var mXSSAttempts = 5;
+    do {
+      if (mXSSAttempts === 0) {
+        throw $sanitizeMinErr('uinput', "Failed to sanitize html because the input is unstable");
+      }
+      mXSSAttempts--;
+
+      // strip custom-namespaced attributes on IE<=11
+      if (window.document.documentMode) {
+        stripCustomNsAttrs(inertBodyElement);
+      }
+      html = inertBodyElement.innerHTML; //trigger mXSS
+      inertBodyElement.innerHTML = html;
+    } while (html !== inertBodyElement.innerHTML);
+
+    var node = inertBodyElement.firstChild;
+    while (node) {
+      switch (node.nodeType) {
+        case 1: // ELEMENT_NODE
+          handler.start(node.nodeName.toLowerCase(), attrToMap(node.attributes));
+          break;
+        case 3: // TEXT NODE
+          handler.chars(node.textContent);
+          break;
+      }
+
+      var nextNode;
+      if (!(nextNode = node.firstChild)) {
+      if (node.nodeType == 1) {
+          handler.end(node.nodeName.toLowerCase());
+        }
+        nextNode = node.nextSibling;
+        if (!nextNode) {
+          while (nextNode == null) {
+            node = node.parentNode;
+            if (node === inertBodyElement) break;
+            nextNode = node.nextSibling;
+          if (node.nodeType == 1) {
+              handler.end(node.nodeName.toLowerCase());
+            }
+          }
+        }
+      }
+      node = nextNode;
+    }
+
+    while (node = inertBodyElement.firstChild) {
+      inertBodyElement.removeChild(node);
+    }
+  }
+
+  function attrToMap(attrs) {
+    var map = {};
+    for (var i = 0, ii = attrs.length; i < ii; i++) {
+      var attr = attrs[i];
+      map[attr.name] = attr.value;
+    }
+    return map;
+  }
+
+
+  /**
+   * Escapes all potentially dangerous characters, so that the
+   * resulting string can be safely inserted into attribute or
+   * element text.
+   * @param value
+   * @returns {string} escaped text
+   */
+  function encodeEntities(value) {
+    return value.
+      replace(/&/g, '&amp;').
+      replace(SURROGATE_PAIR_REGEXP, function(value) {
+        var hi = value.charCodeAt(0);
+        var low = value.charCodeAt(1);
+        return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
+      }).
+      replace(NON_ALPHANUMERIC_REGEXP, function(value) {
+        return '&#' + value.charCodeAt(0) + ';';
+      }).
+      replace(/</g, '&lt;').
+      replace(/>/g, '&gt;');
+  }
+
+  /**
+   * create an HTML/XML writer which writes to buffer
+   * @param {Array} buf use buf.join('') to get out sanitized html string
+   * @returns {object} in the form of {
+   *     start: function(tag, attrs) {},
+   *     end: function(tag) {},
+   *     chars: function(text) {},
+   *     comment: function(text) {}
+   * }
+   */
+  function htmlSanitizeWriterImpl(buf, uriValidator) {
+    var ignoreCurrentElement = false;
+    var out = bind(buf, buf.push);
+    return {
+      start: function(tag, attrs) {
+        tag = lowercase(tag);
+        if (!ignoreCurrentElement && blockedElements[tag]) {
+          ignoreCurrentElement = tag;
+        }
+        if (!ignoreCurrentElement && validElements[tag] === true) {
+          out('<');
+          out(tag);
+          forEach(attrs, function(value, key) {
+            var lkey = lowercase(key);
+            var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background');
+            if (validAttrs[lkey] === true &&
+              (uriAttrs[lkey] !== true || uriValidator(value, isImage))) {
+              out(' ');
+              out(key);
+              out('="');
+              out(encodeEntities(value));
+              out('"');
+            }
+          });
+          out('>');
+        }
+      },
+      end: function(tag) {
+        tag = lowercase(tag);
+        if (!ignoreCurrentElement && validElements[tag] === true && voidElements[tag] !== true) {
+          out('</');
+          out(tag);
+          out('>');
+        }
+        if (tag == ignoreCurrentElement) {
+          ignoreCurrentElement = false;
+        }
+      },
+      chars: function(chars) {
+        if (!ignoreCurrentElement) {
+          out(encodeEntities(chars));
+        }
+      }
+    };
+  }
+
+
+  /**
+   * When IE9-11 comes across an unknown namespaced attribute e.g. 'xlink:foo' it adds 'xmlns:ns1' attribute to declare
+   * ns1 namespace and prefixes the attribute with 'ns1' (e.g. 'ns1:xlink:foo'). This is undesirable since we don't want
+   * to allow any of these custom attributes. This method strips them all.
+   *
+   * @param node Root element to process
+   */
+  function stripCustomNsAttrs(node) {
+    if (node.nodeType === window.Node.ELEMENT_NODE) {
+      var attrs = node.attributes;
+      for (var i = 0, l = attrs.length; i < l; i++) {
+        var attrNode = attrs[i];
+        var attrName = attrNode.name.toLowerCase();
+        if (attrName === 'xmlns:ns1' || attrName.lastIndexOf('ns1:', 0) === 0) {
+          node.removeAttributeNode(attrNode);
+          i--;
+          l--;
+        }
+      }
+    }
+
+    var nextNode = node.firstChild;
+    if (nextNode) {
+      stripCustomNsAttrs(nextNode);
+    }
+
+    nextNode = node.nextSibling;
+    if (nextNode) {
+      stripCustomNsAttrs(nextNode);
+    }
+  }
 }
 
 function sanitizeText(chars) {
   var buf = [];
-  var writer = htmlSanitizeWriter(buf, angular.noop);
+  var writer = htmlSanitizeWriter(buf, noop);
   writer.chars(chars);
   return buf.join('');
 }
 
 
-// Regular Expressions for parsing tags and attributes
-var SURROGATE_PAIR_REGEXP = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
-  // Match everything outside of normal chars and " (quote character)
-  NON_ALPHANUMERIC_REGEXP = /([^\#-~ |!])/g;
-
-
-// Good source of info about elements and attributes
-// http://dev.w3.org/html5/spec/Overview.html#semantics
-// http://simon.html5.org/html-elements
-
-// Safe Void Elements - HTML5
-// http://dev.w3.org/html5/spec/Overview.html#void-elements
-var voidElements = toMap("area,br,col,hr,img,wbr");
-
-// Elements that you can, intentionally, leave open (and which close themselves)
-// http://dev.w3.org/html5/spec/Overview.html#optional-tags
-var optionalEndTagBlockElements = toMap("colgroup,dd,dt,li,p,tbody,td,tfoot,th,thead,tr"),
-    optionalEndTagInlineElements = toMap("rp,rt"),
-    optionalEndTagElements = angular.extend({},
-                                            optionalEndTagInlineElements,
-                                            optionalEndTagBlockElements);
-
-// Safe Block Elements - HTML5
-var blockElements = angular.extend({}, optionalEndTagBlockElements, toMap("address,article," +
-        "aside,blockquote,caption,center,del,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5," +
-        "h6,header,hgroup,hr,ins,map,menu,nav,ol,pre,section,table,ul"));
-
-// Inline Elements - HTML5
-var inlineElements = angular.extend({}, optionalEndTagInlineElements, toMap("a,abbr,acronym,b," +
-        "bdi,bdo,big,br,cite,code,del,dfn,em,font,i,img,ins,kbd,label,map,mark,q,ruby,rp,rt,s," +
-        "samp,small,span,strike,strong,sub,sup,time,tt,u,var"));
-
-// SVG Elements
-// https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Elements
-// Note: the elements animate,animateColor,animateMotion,animateTransform,set are intentionally omitted.
-// They can potentially allow for arbitrary javascript to be executed. See #11290
-var svgElements = toMap("circle,defs,desc,ellipse,font-face,font-face-name,font-face-src,g,glyph," +
-        "hkern,image,linearGradient,line,marker,metadata,missing-glyph,mpath,path,polygon,polyline," +
-        "radialGradient,rect,stop,svg,switch,text,title,tspan");
-
-// Blocked Elements (will be stripped)
-var blockedElements = toMap("script,style");
-
-var validElements = angular.extend({},
-                                   voidElements,
-                                   blockElements,
-                                   inlineElements,
-                                   optionalEndTagElements);
-
-//Attributes that have href and hence need to be sanitized
-var uriAttrs = toMap("background,cite,href,longdesc,src,xlink:href");
-
-var htmlAttrs = toMap('abbr,align,alt,axis,bgcolor,border,cellpadding,cellspacing,class,clear,' +
-    'color,cols,colspan,compact,coords,dir,face,headers,height,hreflang,hspace,' +
-    'ismap,lang,language,nohref,nowrap,rel,rev,rows,rowspan,rules,' +
-    'scope,scrolling,shape,size,span,start,summary,tabindex,target,title,type,' +
-    'valign,value,vspace,width');
-
-// SVG attributes (without "id" and "name" attributes)
-// https://wiki.whatwg.org/wiki/Sanitization_rules#svg_Attributes
-var svgAttrs = toMap('accent-height,accumulate,additive,alphabetic,arabic-form,ascent,' +
-    'baseProfile,bbox,begin,by,calcMode,cap-height,class,color,color-rendering,content,' +
-    'cx,cy,d,dx,dy,descent,display,dur,end,fill,fill-rule,font-family,font-size,font-stretch,' +
-    'font-style,font-variant,font-weight,from,fx,fy,g1,g2,glyph-name,gradientUnits,hanging,' +
-    'height,horiz-adv-x,horiz-origin-x,ideographic,k,keyPoints,keySplines,keyTimes,lang,' +
-    'marker-end,marker-mid,marker-start,markerHeight,markerUnits,markerWidth,mathematical,' +
-    'max,min,offset,opacity,orient,origin,overline-position,overline-thickness,panose-1,' +
-    'path,pathLength,points,preserveAspectRatio,r,refX,refY,repeatCount,repeatDur,' +
-    'requiredExtensions,requiredFeatures,restart,rotate,rx,ry,slope,stemh,stemv,stop-color,' +
-    'stop-opacity,strikethrough-position,strikethrough-thickness,stroke,stroke-dasharray,' +
-    'stroke-dashoffset,stroke-linecap,stroke-linejoin,stroke-miterlimit,stroke-opacity,' +
-    'stroke-width,systemLanguage,target,text-anchor,to,transform,type,u1,u2,underline-position,' +
-    'underline-thickness,unicode,unicode-range,units-per-em,values,version,viewBox,visibility,' +
-    'width,widths,x,x-height,x1,x2,xlink:actuate,xlink:arcrole,xlink:role,xlink:show,xlink:title,' +
-    'xlink:type,xml:base,xml:lang,xml:space,xmlns,xmlns:xlink,y,y1,y2,zoomAndPan', true);
-
-var validAttrs = angular.extend({},
-                                uriAttrs,
-                                svgAttrs,
-                                htmlAttrs);
-
-function toMap(str, lowercaseKeys) {
-  var obj = {}, items = str.split(','), i;
-  for (i = 0; i < items.length; i++) {
-    obj[lowercaseKeys ? angular.lowercase(items[i]) : items[i]] = true;
-  }
-  return obj;
-}
-
-var inertBodyElement;
-(function(window) {
-  var doc;
-  if (window.document && window.document.implementation) {
-    doc = window.document.implementation.createHTMLDocument("inert");
-  } else {
-    throw $sanitizeMinErr('noinert', "Can't create an inert html document");
-  }
-  var docElement = doc.documentElement || doc.getDocumentElement();
-  var bodyElements = docElement.getElementsByTagName('body');
-
-  // usually there should be only one body element in the document, but IE doesn't have any, so we need to create one
-  if (bodyElements.length === 1) {
-    inertBodyElement = bodyElements[0];
-  } else {
-    var html = doc.createElement('html');
-    inertBodyElement = doc.createElement('body');
-    html.appendChild(inertBodyElement);
-    doc.appendChild(html);
-  }
-})(window);
-
-/**
- * @example
- * htmlParser(htmlString, {
- *     start: function(tag, attrs) {},
- *     end: function(tag) {},
- *     chars: function(text) {},
- *     comment: function(text) {}
- * });
- *
- * @param {string} html string
- * @param {object} handler
- */
-function htmlParser(html, handler) {
-  if (html === null || html === undefined) {
-    html = '';
-  } else if (typeof html !== 'string') {
-    html = '' + html;
-  }
-  inertBodyElement.innerHTML = html;
-
-  //mXSS protection
-  var mXSSAttempts = 5;
-  do {
-    if (mXSSAttempts === 0) {
-      throw $sanitizeMinErr('uinput', "Failed to sanitize html because the input is unstable");
-    }
-    mXSSAttempts--;
-
-    // strip custom-namespaced attributes on IE<=11
-    if (window.document.documentMode) {
-      stripCustomNsAttrs(inertBodyElement);
-    }
-    html = inertBodyElement.innerHTML; //trigger mXSS
-    inertBodyElement.innerHTML = html;
-  } while (html !== inertBodyElement.innerHTML);
-
-  var node = inertBodyElement.firstChild;
-  while (node) {
-    switch (node.nodeType) {
-      case 1: // ELEMENT_NODE
-        handler.start(node.nodeName.toLowerCase(), attrToMap(node.attributes));
-        break;
-      case 3: // TEXT NODE
-        handler.chars(node.textContent);
-        break;
-    }
-
-    var nextNode;
-    if (!(nextNode = node.firstChild)) {
-      if (node.nodeType == 1) {
-        handler.end(node.nodeName.toLowerCase());
-      }
-      nextNode = node.nextSibling;
-      if (!nextNode) {
-        while (nextNode == null) {
-          node = node.parentNode;
-          if (node === inertBodyElement) break;
-          nextNode = node.nextSibling;
-          if (node.nodeType == 1) {
-            handler.end(node.nodeName.toLowerCase());
-          }
-        }
-      }
-    }
-    node = nextNode;
-  }
-
-  while (node = inertBodyElement.firstChild) {
-    inertBodyElement.removeChild(node);
-  }
-}
-
-function attrToMap(attrs) {
-  var map = {};
-  for (var i = 0, ii = attrs.length; i < ii; i++) {
-    var attr = attrs[i];
-    map[attr.name] = attr.value;
-  }
-  return map;
-}
-
-
-/**
- * Escapes all potentially dangerous characters, so that the
- * resulting string can be safely inserted into attribute or
- * element text.
- * @param value
- * @returns {string} escaped text
- */
-function encodeEntities(value) {
-  return value.
-    replace(/&/g, '&amp;').
-    replace(SURROGATE_PAIR_REGEXP, function(value) {
-      var hi = value.charCodeAt(0);
-      var low = value.charCodeAt(1);
-      return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
-    }).
-    replace(NON_ALPHANUMERIC_REGEXP, function(value) {
-      return '&#' + value.charCodeAt(0) + ';';
-    }).
-    replace(/</g, '&lt;').
-    replace(/>/g, '&gt;');
-}
-
-/**
- * create an HTML/XML writer which writes to buffer
- * @param {Array} buf use buf.join('') to get out sanitized html string
- * @returns {object} in the form of {
- *     start: function(tag, attrs) {},
- *     end: function(tag) {},
- *     chars: function(text) {},
- *     comment: function(text) {}
- * }
- */
-function htmlSanitizeWriter(buf, uriValidator) {
-  var ignoreCurrentElement = false;
-  var out = angular.bind(buf, buf.push);
-  return {
-    start: function(tag, attrs) {
-      tag = angular.lowercase(tag);
-      if (!ignoreCurrentElement && blockedElements[tag]) {
-        ignoreCurrentElement = tag;
-      }
-      if (!ignoreCurrentElement && validElements[tag] === true) {
-        out('<');
-        out(tag);
-        angular.forEach(attrs, function(value, key) {
-          var lkey=angular.lowercase(key);
-          var isImage = (tag === 'img' && lkey === 'src') || (lkey === 'background');
-          if (validAttrs[lkey] === true &&
-            (uriAttrs[lkey] !== true || uriValidator(value, isImage))) {
-            out(' ');
-            out(key);
-            out('="');
-            out(encodeEntities(value));
-            out('"');
-          }
-        });
-        out('>');
-      }
-    },
-    end: function(tag) {
-      tag = angular.lowercase(tag);
-      if (!ignoreCurrentElement && validElements[tag] === true && voidElements[tag] !== true) {
-        out('</');
-        out(tag);
-        out('>');
-      }
-      if (tag == ignoreCurrentElement) {
-        ignoreCurrentElement = false;
-      }
-    },
-    chars: function(chars) {
-      if (!ignoreCurrentElement) {
-        out(encodeEntities(chars));
-      }
-    }
-  };
-}
-
-
-/**
- * When IE9-11 comes across an unknown namespaced attribute e.g. 'xlink:foo' it adds 'xmlns:ns1' attribute to declare
- * ns1 namespace and prefixes the attribute with 'ns1' (e.g. 'ns1:xlink:foo'). This is undesirable since we don't want
- * to allow any of these custom attributes. This method strips them all.
- *
- * @param node Root element to process
- */
-function stripCustomNsAttrs(node) {
-  if (node.nodeType === window.Node.ELEMENT_NODE) {
-    var attrs = node.attributes;
-    for (var i = 0, l = attrs.length; i < l; i++) {
-      var attrNode = attrs[i];
-      var attrName = attrNode.name.toLowerCase();
-      if (attrName === 'xmlns:ns1' || attrName.lastIndexOf('ns1:', 0) === 0) {
-        node.removeAttributeNode(attrNode);
-        i--;
-        l--;
-      }
-    }
-  }
-
-  var nextNode = node.firstChild;
-  if (nextNode) {
-    stripCustomNsAttrs(nextNode);
-  }
-
-  nextNode = node.nextSibling;
-  if (nextNode) {
-    stripCustomNsAttrs(nextNode);
-  }
-}
-
-
-
 // define ngSanitize module and register $sanitize service
 angular.module('ngSanitize', []).provider('$sanitize', $SanitizeProvider);
-
-/* global sanitizeText: false */
 
 /**
  * @ngdoc filter
@@ -28488,6 +28506,9 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
       MAILTO_REGEXP = /^mailto:/i;
 
   var linkyMinErr = angular.$$minErr('linky');
+  var isDefined = angular.isDefined;
+  var isFunction = angular.isFunction;
+  var isObject = angular.isObject;
   var isString = angular.isString;
 
   return function(text, target, attributes) {
@@ -28495,8 +28516,8 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
     if (!isString(text)) throw linkyMinErr('notstring', 'Expected string but received: {0}', text);
 
     var attributesFn =
-      angular.isFunction(attributes) ? attributes :
-      angular.isObject(attributes) ? function getAttributesObject() {return attributes;} :
+      isFunction(attributes) ? attributes :
+      isObject(attributes) ? function getAttributesObject() {return attributes;} :
       function getEmptyAttributesObject() {return {};};
 
     var match;
@@ -28534,7 +28555,7 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
         html.push(key + '="' + linkAttributes[key] + '" ');
       }
 
-      if (angular.isDefined(target) && !('target' in linkAttributes)) {
+      if (isDefined(target) && !('target' in linkAttributes)) {
         html.push('target="',
                   target,
                   '" ');
@@ -56633,6 +56654,199 @@ r.right.type=tn.Identifier,r.right.name="yield",delete r.right.argument,delete r
 	 */
 "use strict";function r(e,t){c("Bundling $ref pointers in %s",e.$refs._root$Ref.path);var n=[];i(e,"schema",e.$refs._root$Ref.path+"#","#",n,e.$refs,t),u(n)}function i(e,t,n,r,u,c,l){var f=null===t?e:e[t];if(f&&"object"==typeof f)if(s.is$Ref(f))o(e,t,n,r,u,c,l);else{var h=Object.keys(f),p=h.indexOf("definitions");p>0&&h.splice(0,0,h.splice(p,1)[0]),h.forEach(function(e){var t=a.join(n,e),h=a.join(r,e),p=f[e];s.is$Ref(p)?o(f,e,n,h,u,c,l):i(f,e,t,h,u,c,l)})}}function o(e,t,n,r,o,u,c){if(!o.some(function(n){return n.parent===e&&n.key===t})){var f=null===t?e:e[t],h=l.resolve(n,f.$ref),p=u._resolve(h,c),d=a.parse(r).length,m=l.stripHash(p.path),y=l.getHash(p.path),v=m!==u._root$Ref.path,g=s.isExtended$Ref(f);o.push({$ref:f,parent:e,key:t,pathFromRoot:r,depth:d,file:m,hash:y,value:p.value,circular:p.circular,extended:g,external:v}),i(p.value,null,p.path,r,o,u,c)}}function u(e){e.sort(function(e,t){return e.file!==t.file?e.file<t.file?-1:1:e.hash!==t.hash?e.hash<t.hash?-1:1:e.circular!==t.circular?e.circular?-1:1:e.extended!==t.extended?e.extended?1:-1:e.depth!==t.depth?e.depth-t.depth:t.pathFromRoot.lastIndexOf("/definitions")-e.pathFromRoot.lastIndexOf("/definitions")});var t,n,r;e.forEach(function(e){c('Re-mapping $ref pointer "%s" at %s',e.$ref.$ref,e.pathFromRoot),e.external?e.file===t&&e.hash===n?e.$ref.$ref=r:e.file===t&&0===e.hash.indexOf(n+"/")?e.$ref.$ref=a.join(r,a.parse(e.hash)):(t=e.file,n=e.hash,r=e.pathFromRoot,e.$ref=e.parent[e.key]=s.dereference(e.$ref,e.value),e.circular&&(e.$ref.$ref=e.pathFromRoot)):e.$ref.$ref=e.hash,c("    new value: %s",e.$ref&&e.$ref.$ref?e.$ref.$ref:"[object Object]")})}var s=n(14),a=n(16),c=n(8),l=n(3);e.exports=r},function(e,t,n){"use strict";function r(e,t){l("Dereferencing $ref pointers in %s",e.$refs._root$Ref.path);var n=i(e.schema,e.$refs._root$Ref.path,"#",[],e.$refs,t);e.$refs.circular=n.circular,e.schema=n.value}function i(e,t,n,r,c,l){var f,h={value:e,circular:!1};return e&&"object"==typeof e&&(r.push(e),s.isAllowed$Ref(e,l)?(f=o(e,t,n,r,c,l),h.circular=f.circular,h.value=f.value):Object.keys(e).forEach(function(p){var d=a.join(t,p),m=a.join(n,p),y=e[p],v=!1;s.isAllowed$Ref(y,l)?(f=o(y,d,m,r,c,l),v=f.circular,e[p]=f.value):r.indexOf(y)===-1?(f=i(y,d,m,r,c,l),v=f.circular,e[p]=f.value):v=u(d,c,l),h.circular=h.circular||v}),r.pop()),h}function o(e,t,n,r,o,a){l('Dereferencing $ref pointer "%s" at %s',e.$ref,t);var c=f.resolve(t,e.$ref),h=o._resolve(c,a),p=h.circular,d=p||r.indexOf(h.value)!==-1;d&&u(t,o,a);var m=s.dereference(e,h.value);if(!d){var y=i(m,h.path,n,r,o,a);d=y.circular,m=y.value}return d&&!p&&"ignore"===a.dereference.circular&&(m=e),p&&(m.$ref=n),{circular:d,value:m}}function u(e,t,n){if(t.circular=!0,!n.dereference.circular)throw c.reference("Circular $ref pointer found at %s",e);return!0}var s=n(14),a=n(16),c=n(6),l=n(8),f=n(3);e.exports=r},function(e,t,n){(function(t){"use strict";function r(){this.schema=null,this.$refs=new s}function i(e){var t,n,r,i;return e=Array.prototype.slice.call(e),"function"==typeof e[e.length-1]&&(i=e.pop()),"string"==typeof e[0]?(t=e[0],"object"==typeof e[2]?(n=e[1],r=e[2]):(n=void 0,r=e[1])):(t="",n=e[0],r=e[1]),r instanceof u||(r=new u(r)),{path:t,schema:n,options:r,callback:i}}var o=n(5),u=n(77),s=n(82),a=n(27),c=n(83),l=n(74),f=n(75),h=n(3),p=n(41),d=n(6);e.exports=r,e.exports.YAML=n(28),r.parse=function(e,t,n){var r=this,i=new r;return i.parse.apply(i,arguments)},r.prototype.parse=function(e,n,r){var u,c=i(arguments);if(!c.path&&!c.schema){var l=d("Expected a file path, URL, or object. Got %s",c.path||c.schema);return p(c.callback,o.reject(l))}this.schema=null,this.$refs=new s,h.isFileSystemPath(c.path)&&(c.path=h.fromFileSystemPath(c.path)),c.path=h.resolve(h.cwd(),c.path),c.schema&&"object"==typeof c.schema?(this.$refs._add(c.path,c.schema),u=o.resolve(c.schema)):u=a(c.path,this.$refs,c.options);var f=this;return u.then(function(e){if(!e||"object"!=typeof e||t.isBuffer(e))throw d.syntax('"%s" is not a valid JSON Schema',f.$refs._root$Ref.path||e);return f.schema=e,p(c.callback,o.resolve(f.schema))})["catch"](function(e){return p(c.callback,o.reject(e))})},r.resolve=function(e,t,n){var r=this,i=new r;return i.resolve.apply(i,arguments)},r.prototype.resolve=function(e,t,n){var r=this,u=i(arguments);return this.parse(u.path,u.schema,u.options).then(function(){return c(r,u.options)}).then(function(){return p(u.callback,o.resolve(r.$refs))})["catch"](function(e){return p(u.callback,o.reject(e))})},r.bundle=function(e,t,n){var r=this,i=new r;return i.bundle.apply(i,arguments)},r.prototype.bundle=function(e,t,n){var r=this,u=i(arguments);return this.resolve(u.path,u.schema,u.options).then(function(){return l(r,u.options),p(u.callback,o.resolve(r.schema))})["catch"](function(e){return p(u.callback,o.reject(e))})},r.dereference=function(e,t,n){var r=this,i=new r;return i.dereference.apply(i,arguments)},r.prototype.dereference=function(e,t,n){var r=this,u=i(arguments);return this.resolve(u.path,u.schema,u.options).then(function(){return f(r,u.options),p(u.callback,o.resolve(r.schema))})["catch"](function(e){return p(u.callback,o.reject(e))})}}).call(t,n(2).Buffer)},function(e,t,n){"use strict";function r(e){i(this,r.defaults),i(this,e)}function i(e,t){if(o(t))for(var n=Object.keys(t),r=0;r<n.length;r++){var u=n[r],s=t[u],a=e[u];o(s)?e[u]=i(a||{},s):void 0!==s&&(e[u]=s)}return e}function o(e){return e&&"object"==typeof e&&!Array.isArray(e)&&!(e instanceof RegExp)&&!(e instanceof Date)}var u=n(79),s=n(81),a=n(80),c=n(78),l=n(84),f=n(85),h=n(87);e.exports=r,r.defaults={parse:{json:u,yaml:s,text:a,binary:c},resolve:{file:l,http:f,external:!0},dereference:{circular:!0},validate:{zschema:h}}},function(e,t,n){(function(t){"use strict";var n=/\.(jpeg|jpg|gif|png|bmp|ico)$/i;e.exports={order:400,allowEmpty:!0,canParse:function(e){return t.isBuffer(e.data)&&n.test(e.url)},parse:function(e){return t.isBuffer(e.data)?e.data:new t(e.data)}}}).call(t,n(2).Buffer)},function(e,t,n){(function(t){"use strict";var r=n(5);e.exports={order:100,allowEmpty:!0,canParse:".json",parse:function(e){return new r(function(n,r){var i=e.data;t.isBuffer(i)&&(i=i.toString()),n("string"==typeof i?0===i.trim().length?void 0:JSON.parse(i):i)})}}}).call(t,n(2).Buffer)},function(e,t,n){(function(t){"use strict";var n=/\.(txt|htm|html|md|xml|js|min|map|css|scss|less|svg)$/i;e.exports={order:300,allowEmpty:!0,encoding:"utf8",canParse:function(e){return("string"==typeof e.data||t.isBuffer(e.data))&&n.test(e.url)},parse:function(e){if("string"==typeof e.data)return e.data;if(t.isBuffer(e.data))return e.data.toString(this.encoding);throw new Error("data is not text")}}}).call(t,n(2).Buffer)},function(e,t,n){(function(t){"use strict";var r=n(5),i=n(28);e.exports={order:200,allowEmpty:!0,canParse:[".yaml",".yml",".json"],parse:function(e){return new r(function(n,r){var o=e.data;t.isBuffer(o)&&(o=o.toString()),n("string"==typeof o?i.parse(o):o)})}}}).call(t,n(2).Buffer)},function(e,t,n){"use strict";function r(){this.circular=!1,this._$refs={},this._root$Ref=null}function i(e,t){var n=Object.keys(e);return t=Array.isArray(t[0])?t[0]:Array.prototype.slice.call(t),t.length>0&&t[0]&&(n=n.filter(function(n){return t.indexOf(e[n].pathType)!==-1})),n.map(function(t){return{encoded:t,decoded:"file"===e[t].pathType?s.toFileSystemPath(t,!0):t}})}var o=n(6),u=n(14),s=n(3);e.exports=r,r.prototype.paths=function(e){var t=i(this._$refs,arguments);return t.map(function(e){return e.decoded})},r.prototype.values=function(e){var t=this._$refs,n=i(t,arguments);return n.reduce(function(e,n){return e[n.decoded]=t[n.encoded].value,e},{})},r.prototype.toJSON=r.prototype.values,r.prototype.exists=function(e,t){try{return this._resolve(e,t),!0}catch(n){return!1}},r.prototype.get=function(e,t){return this._resolve(e,t).value},r.prototype.set=function(e,t){e=s.resolve(this._root$Ref.path,e);var n=s.stripHash(e),r=this._$refs[n];if(!r)throw o('Error resolving $ref pointer "%s". \n"%s" not found.',e,n);r.set(e,t)},r.prototype._add=function(e,t){var n=s.stripHash(e),r=new u;return r.path=n,r.value=t,r.$refs=this,this._$refs[n]=r,this._root$Ref=this._root$Ref||r,r},r.prototype._resolve=function(e,t){e=s.resolve(this._root$Ref.path,e);var n=s.stripHash(e),r=this._$refs[n];if(!r)throw o('Error resolving $ref pointer "%s". \n"%s" not found.',e,n);return r.resolve(e,t)},r.prototype._get$Ref=function(e){e=s.resolve(this._root$Ref.path,e);var t=s.stripHash(e);return this._$refs[t]}},function(e,t,n){"use strict";function r(e,t){if(!t.resolve.external)return u.resolve();try{l("Resolving $ref pointers in %s",e.$refs._root$Ref.path);var n=i(e.schema,e.$refs._root$Ref.path+"#",e.$refs,t);return u.all(n)}catch(r){return u.reject(r)}}function i(e,t,n,r){var u=[];return e&&"object"==typeof e&&(s.isExternal$Ref(e)?u.push(o(e,t,n,r)):Object.keys(e).forEach(function(c){var l=a.join(t,c),f=e[c];s.isExternal$Ref(f)?u.push(o(f,l,n,r)):u=u.concat(i(f,l,n,r))})),u}function o(e,t,n,r){l('Resolving $ref pointer "%s" at %s',e.$ref,t);var o=f.resolve(t,e.$ref),s=f.stripHash(o);return e=n._$refs[s],e?u.resolve(e.value):c(o,n,r).then(function(e){l("Resolving $ref pointers in %s",s);var t=i(e,s+"#",n,r);return u.all(t)})}var u=n(5),s=n(14),a=n(16),c=n(27),l=n(8),f=n(3);e.exports=r},function(e,t,n){"use strict";var r=n(102),i=n(6),o=n(5),u=n(3),s=n(8);e.exports={order:100,canRead:function(e){return u.isFileSystemPath(e.url)},read:function(e){return new o(function(t,n){var o;try{o=u.toFileSystemPath(e.url)}catch(a){n(i.uri(a,"Malformed URI: %s",e.url))}s("Opening file: %s",o);try{r.readFile(o,function(e,r){e?n(i(e,'Error opening file "%s"',o)):t(r)})}catch(a){n(i(a,'Error opening file "%s"',o))}})}}},function(e,t,n){(function(t,r){"use strict";function i(e,t,n){return new f(function(u,s){e=c.parse(e),n=n||[],n.push(e.href),o(e,t).then(function(o){if(o.statusCode>=400)throw a({status:o.statusCode},"HTTP ERROR %d",o.statusCode);if(o.statusCode>=300)if(n.length>t.redirects)s(a({status:o.statusCode},"Error downloading %s. \nToo many redirects: \n  %s",n[0],n.join(" \n  ")));else{if(!o.headers.location)throw a({status:o.statusCode},"HTTP %d redirect with no location header",o.statusCode);l("HTTP %d redirect %s -> %s",o.statusCode,e.href,o.headers.location);var f=c.resolve(e,o.headers.location);i(f,t,n).then(u,s)}else u(o.body||new r(0))})["catch"](function(t){s(a(t,"Error downloading",e.href))})})}function o(e,t){return new f(function(n,i){l("GET",e.href);var o="https:"===e.protocol?s:u,a=o.get({hostname:e.hostname,port:e.port,path:e.path,auth:e.auth,headers:t.headers||{},withCredentials:t.withCredentials});"function"==typeof a.setTimeout&&a.setTimeout(t.timeout),a.on("timeout",function(){a.abort()}),a.on("error",i),a.once("response",function(e){e.body=new r(0),e.on("data",function(t){e.body=r.concat([e.body,new r(t)])}),e.on("error",i),e.on("end",function(){n(e)})})})}var u=n(24),s=n(50),a=n(6),c=n(3),l=n(8),f=n(5);e.exports={order:200,headers:null,timeout:5e3,redirects:5,withCredentials:!1,canRead:function(e){return c.isHttp(e.url)},read:function(e){var n=c.parse(e.url);return t.browser&&!n.protocol&&(n.protocol=c.parse(location.href).protocol),i(n,this)}}}).call(t,n(7),n(2).Buffer)},function(e,t,n){"use strict";function r(e,t,n,r){var i=e[t];if("function"==typeof i)return i.apply(e,[n,r]);if(!r){if(i instanceof RegExp)return i.test(n.url);if("string"==typeof i)return i===n.extension;if(Array.isArray(i))return i.indexOf(n.extension)!==-1}return i}var i=n(5),o=n(8);t.all=function(e){return Object.keys(e).filter(function(t){return"object"==typeof e[t]}).map(function(t){return e[t].name=t,e[t]})},t.filter=function(e,t,n){return e.filter(function(e){return!!r(e,t,n)})},t.sort=function(e){return e.forEach(function(e){e.order=e.order||Number.MAX_SAFE_INTEGER}),e.sort(function(e,t){return e.order-t.order})},t.run=function(e,t,n){var u,s,a=0;return new i(function(i,c){function l(){if(u=e[a++],!u)return c(s);try{o("  %s",u.name);var i=r(u,t,n,f);i&&"function"==typeof i.then?i.then(h,p):void 0!==i&&h(i)}catch(l){p(l)}}function f(e,t){e?p(e):h(t)}function h(e){o("    success"),i({plugin:u,result:e})}function p(e){o("    %s",e.message||e),s=e,l()}l()})}},function(e,t){"use strict";e.exports={order:100,canValidate:function(e){return!!e.resolved},validate:function(e){}}},function(e,t,n){var r=n(95),i=r.Symbol;e.exports=i},function(e,t){function n(e,t,n){var r=-1,i=e.length;t<0&&(t=-t>i?0:i+t),n=n>i?i:n,n<0&&(n+=i),i=t>n?0:n-t>>>0,t>>>=0;for(var o=Array(i);++r<i;)o[r]=e[r+t];return o}e.exports=n},function(e,t,n){function r(e,t,n){var r=e.length;return n=void 0===n?r:n,!t&&n>=r?e:i(e,t,n)}var i=n(89);e.exports=r},function(e,t,n){function r(e,t){for(var n=e.length;n--&&i(t,e[n],0)>-1;);return n}var i=n(29);e.exports=r},function(e,t,n){function r(e,t){for(var n=-1,r=e.length;++n<r&&i(t,e[n],0)>-1;);return n}var i=n(29);e.exports=r},function(e,t){function n(e){return e&&e.Object===Object?e:null}e.exports=n},function(e,t){function n(e,t,n){for(var r=e.length,i=t+(n?1:-1);n?i--:++i<r;){var o=e[i];if(o!==o)return i}return-1}e.exports=n},function(e,t,n){(function(t){var r=n(93),i=r("object"==typeof t&&t),o=r("object"==typeof self&&self),u=r("object"==typeof this&&this),s=i||o||u||Function("return this")();e.exports=s}).call(t,function(){return this}())},function(e,t){function n(e){return e.match(A)}var r="\\ud800-\\udfff",i="\\u0300-\\u036f\\ufe20-\\ufe23",o="\\u20d0-\\u20f0",u="\\ufe0e\\ufe0f",s="["+r+"]",a="["+i+o+"]",c="\\ud83c[\\udffb-\\udfff]",l="(?:"+a+"|"+c+")",f="[^"+r+"]",h="(?:\\ud83c[\\udde6-\\uddff]){2}",p="[\\ud800-\\udbff][\\udc00-\\udfff]",d="\\u200d",m=l+"?",y="["+u+"]?",v="(?:"+d+"(?:"+[f,h,p].join("|")+")"+y+m+")*",g=y+m+v,D="(?:"+[f+a+"?",a,h,p,s].join("|")+")",A=RegExp(c+"(?="+c+")|"+D+g,"g");e.exports=n},function(e,t){function n(e){return!!e&&"object"==typeof e}e.exports=n},function(e,t,n){function r(e){return"symbol"==typeof e||i(e)&&s.call(e)==o}var i=n(97),o="[object Symbol]",u=Object.prototype,s=u.toString;e.exports=r},function(e,t,n){function r(e){return null==e?"":i(e)}var i=n(30);e.exports=r},function(e,t,n){function r(e,t,n){if(e=c(e),e&&(n||void 0===t))return e.replace(l,"");if(!e||!(t=i(t)))return e;var r=a(e),f=a(t),h=s(r,f),p=u(r,f)+1;return o(r,h,p).join("")}var i=n(30),o=n(90),u=n(91),s=n(92),a=n(96),c=n(99),l=/^\s+|\s+$/g;e.exports=r},function(e,t){function n(e){if(e=""+e,!(e.length>1e4)){var t=/^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(e);if(t){var n=parseFloat(t[1]),r=(t[2]||"ms").toLowerCase();switch(r){case"years":case"year":case"yrs":case"yr":case"y":return n*l;case"days":case"day":case"d":return n*c;case"hours":case"hour":case"hrs":case"hr":case"h":return n*a;case"minutes":case"minute":case"mins":case"min":case"m":return n*s;case"seconds":case"second":case"secs":case"sec":case"s":return n*u;case"milliseconds":case"millisecond":case"msecs":case"msec":case"ms":return n}}}}function r(e){return e>=c?Math.round(e/c)+"d":e>=a?Math.round(e/a)+"h":e>=s?Math.round(e/s)+"m":e>=u?Math.round(e/u)+"s":e+"ms"}function i(e){return o(e,c,"day")||o(e,a,"hour")||o(e,s,"minute")||o(e,u,"second")||e+" ms"}function o(e,t,n){if(!(e<t))return e<1.5*t?Math.floor(e/t)+" "+n:Math.ceil(e/t)+" "+n+"s"}var u=1e3,s=60*u,a=60*s,c=24*a,l=365.25*c;e.exports=function(e,t){return t=t||{},"string"==typeof e?n(e):t["long"]?i(e):r(e)}},function(e,t){},function(e,t){"use strict";function n(e,t){return Object.prototype.hasOwnProperty.call(e,t)}e.exports=function(e,t,r,i){t=t||"&",r=r||"=";var o={};if("string"!=typeof e||0===e.length)return o;var u=/\+/g;e=e.split(t);var s=1e3;i&&"number"==typeof i.maxKeys&&(s=i.maxKeys);var a=e.length;s>0&&a>s&&(a=s);for(var c=0;c<a;++c){var l,f,h,p,d=e[c].replace(u,"%20"),m=d.indexOf(r);m>=0?(l=d.substr(0,m),f=d.substr(m+1)):(l=d,f=""),h=decodeURIComponent(l),p=decodeURIComponent(f),n(o,h)?Array.isArray(o[h])?o[h].push(p):o[h]=[o[h],p]:o[h]=p}return o}},function(e,t){"use strict";var n=function(e){switch(typeof e){case"string":return e;case"boolean":return e?"true":"false";case"number":return isFinite(e)?e:"";default:return""}};e.exports=function(e,t,r,i){return t=t||"&",r=r||"=",null===e&&(e=void 0),"object"==typeof e?Object.keys(e).map(function(i){var o=encodeURIComponent(n(i))+r;return Array.isArray(e[i])?e[i].map(function(e){return o+encodeURIComponent(n(e))}).join(t):o+encodeURIComponent(n(e[i]))}).join(t):i?encodeURIComponent(n(i))+r+encodeURIComponent(n(e)):""}},function(e,t,n){"use strict";t.decode=t.parse=n(103),t.encode=t.stringify=n(104)},function(e,t){"use strict";function n(e){for(var t,n=/([^=?&]+)=([^&]*)/g,r={};t=n.exec(e);r[decodeURIComponent(t[1])]=decodeURIComponent(t[2]));return r}function r(e,t){t=t||"";var n=[];"string"!=typeof t&&(t="?");for(var r in e)i.call(e,r)&&n.push(encodeURIComponent(r)+"="+encodeURIComponent(e[r]));return n.length?t+n.join("&"):""}var i=Object.prototype.hasOwnProperty;t.stringify=r,t.parse=n},function(e,t,n){e.exports=n(17)},function(e,t,n){e.exports=n(31)},function(e,t,n){t=e.exports=n(32),t.Readable=t,t.Writable=n(22),t.Duplex=n(17),t.Transform=n(21),t.PassThrough=n(31)},function(e,t,n){e.exports=n(21)},function(e,t,n){e.exports=n(22)},function(e,t){"use strict";e.exports=function(e,t){if(t=t.split(":")[0],e=+e,!e)return!1;switch(t){case"http":case"ws":return 80!==e;case"https":case"wss":return 443!==e;case"ftp":return 21!==e;case"gopher":return 70!==e;case"file":return!1}return 0!==e}},function(e,t,n){(function(t){"use strict";var r,i=/^[A-Za-z][A-Za-z0-9+-.]*:\/\//,o={hash:1,query:1};e.exports=function(e){e=e||t.location||{},r=r||n(34);var u,s={},a=typeof e;if("blob:"===e.protocol)s=new r(unescape(e.pathname),{});else if("string"===a){s=new r(e,{});for(u in o)delete s[u]}else if("object"===a){for(u in e)u in o||(s[u]=e[u]);void 0===s.slashes&&(s.slashes=i.test(e.href))}return s}}).call(t,function(){return this}())},function(e,t,n){var r;(function(e,i){!function(o){function u(e){throw RangeError(O[e])}function s(e,t){for(var n=e.length,r=[];n--;)r[n]=t(e[n]);return r}function a(e,t){var n=e.split("@"),r="";n.length>1&&(r=n[0]+"@",e=n[1]),e=e.replace(_,".");var i=e.split("."),o=s(i,t).join(".");return r+o}function c(e){for(var t,n,r=[],i=0,o=e.length;i<o;)t=e.charCodeAt(i++),t>=55296&&t<=56319&&i<o?(n=e.charCodeAt(i++),56320==(64512&n)?r.push(((1023&t)<<10)+(1023&n)+65536):(r.push(t),i--)):r.push(t);return r}function l(e){return s(e,function(e){var t="";return e>65535&&(e-=65536,t+=L(e>>>10&1023|55296),e=56320|1023&e),t+=L(e)}).join("")}function f(e){return e-48<10?e-22:e-65<26?e-65:e-97<26?e-97:E}function h(e,t){return e+22+75*(e<26)-((0!=t)<<5)}function p(e,t,n){var r=0;for(e=n?R(e/F):e>>1,e+=R(e/t);e>j*w>>1;r+=E)e=R(e/j);return R(r+(j+1)*e/(e+C))}function d(e){var t,n,r,i,o,s,a,c,h,d,m=[],y=e.length,v=0,g=S,D=x;for(n=e.lastIndexOf(B),n<0&&(n=0),r=0;r<n;++r)e.charCodeAt(r)>=128&&u("not-basic"),m.push(e.charCodeAt(r));for(i=n>0?n+1:0;i<y;){for(o=v,s=1,a=E;i>=y&&u("invalid-input"),c=f(e.charCodeAt(i++)),(c>=E||c>R((A-v)/s))&&u("overflow"),v+=c*s,h=a<=D?b:a>=D+w?w:a-D,!(c<h);a+=E)d=E-h,s>R(A/d)&&u("overflow"),s*=d;t=m.length+1,D=p(v-o,t,0==o),R(v/t)>A-g&&u("overflow"),g+=R(v/t),v%=t,m.splice(v++,0,g)}return l(m)}function m(e){var t,n,r,i,o,s,a,l,f,d,m,y,v,g,D,C=[];for(e=c(e),y=e.length,t=S,n=0,o=x,s=0;s<y;++s)m=e[s],m<128&&C.push(L(m));for(r=i=C.length,i&&C.push(B);r<y;){for(a=A,s=0;s<y;++s)m=e[s],m>=t&&m<a&&(a=m);for(v=r+1,a-t>R((A-n)/v)&&u("overflow"),n+=(a-t)*v,t=a,s=0;s<y;++s)if(m=e[s],m<t&&++n>A&&u("overflow"),m==t){for(l=n,f=E;d=f<=o?b:f>=o+w?w:f-o,!(l<d);f+=E)D=l-d,g=E-d,C.push(L(h(d+D%g,0))),l=R(D/g);C.push(L(h(l,0))),o=p(n,v,r==i),n=0,++r}++n,++t}return C.join("")}function y(e){return a(e,function(e){return k.test(e)?d(e.slice(4).toLowerCase()):e})}function v(e){return a(e,function(e){return I.test(e)?"xn--"+m(e):e})}var g=("object"==typeof t&&t&&!t.nodeType&&t,"object"==typeof e&&e&&!e.nodeType&&e,"object"==typeof i&&i);g.global!==g&&g.window!==g&&g.self!==g||(o=g);var D,A=2147483647,E=36,b=1,w=26,C=38,F=700,x=72,S=128,B="-",k=/^xn--/,I=/[^\x20-\x7E]/,_=/[\x2E\u3002\uFF0E\uFF61]/g,O={overflow:"Overflow: input needs wider integers to process","not-basic":"Illegal input >= 0x80 (not a basic code point)","invalid-input":"Invalid input"},j=E-b,R=Math.floor,L=String.fromCharCode;D={version:"1.3.2",ucs2:{decode:c,encode:l},decode:d,encode:m,toASCII:v,toUnicode:y},r=function(){return D}.call(t,n,t,e),!(void 0!==r&&(e.exports=r))}(this)}).call(t,n(36)(e),function(){return this}())},function(e,t){e.exports=function(e){return e&&"object"==typeof e&&"function"==typeof e.copy&&"function"==typeof e.fill&&"function"==typeof e.readUInt8}},function(e,t){e.exports=function(){throw new Error("define cannot be used indirect")}},function(e,t){}])});
 //# sourceMappingURL=bundle.js.map
+(function(root, factory) {
+
+ 'use strict';
+
+  if (typeof require === 'function' && typeof exports === 'object' && typeof module === 'object') {
+    // CommonJS
+    module.exports = factory();
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define('json-schema-defaults', [], function() {
+      return factory();
+    });
+  } else {
+    // global with noConflict
+    var jsonSchemaDefaults = root.jsonSchemaDefaults;
+    root.jsonSchemaDefaults = factory();
+    root.jsonSchemaDefaults.noConflict = function() {
+      var defaults = root.jsonSchemaDefaults;
+      root.jsonSchemaDefaults = jsonSchemaDefaults;
+      return defaults;
+    };
+  }
+
+}(this, function() {
+
+  'use strict';
+
+  /**
+   * check whether item is plain object
+   * @param {*} item
+   * @return {Boolean}
+   */
+  var isObject = function(item) {
+    return typeof item === 'object' && item !== null && item.toString() === {}.toString();
+  };
+
+  /**
+   * deep JSON object clone
+   *
+   * @param {Object} source
+   * @return {Object}
+   */
+  var cloneJSON = function(source) {
+    return JSON.parse(JSON.stringify(source));
+  };
+
+  /**
+   * returns a result of deep merge of two objects
+   *
+   * @param {Object} target
+   * @param {Object} source
+   * @return {Object}
+   */
+  var merge = function(target, source) {
+    target = cloneJSON(target);
+
+    for (var key in source) {
+      if (source.hasOwnProperty(key)) {
+        if (isObject(target[key]) && isObject(source[key])) {
+          target[key] = merge(target[key], source[key]);
+        } else {
+          target[key] = source[key];
+        }
+      }
+    }
+    return target;
+  };
+
+
+  /**
+   * get object by reference. works only with local references that points on
+   * definitions object
+   *
+   * @param {String} path
+   * @param {Object} definitions
+   * @return {Object}
+   */
+  var getLocalRef = function(path, definitions) {
+    path = path.replace(/^#\/definitions\//, '').split('/');
+
+    var find = function(path, root) {
+      var key = path.shift();
+      if (!root[key]) {
+        return {};
+      } else if (!path.length) {
+        return root[key];
+      } else {
+        return find(path, root[key]);
+      }
+    };
+
+    var result = find(path, definitions);
+
+    if (!isObject(result)) {
+      return result;
+    }
+    return cloneJSON(result);
+  };
+
+
+  /**
+   * merge list of objects from allOf properties
+   * if some of objects contains $ref field extracts this reference and merge it
+   *
+   * @param {Array} allOfList
+   * @param {Object} definitions
+   * @return {Object}
+   */
+  var mergeAllOf = function(allOfList, definitions) {
+    var length = allOfList.length,
+        index = -1,
+        result = {};
+
+    while (++index < length) {
+      var item = allOfList[index];
+
+      item = (typeof item.$ref !== 'undefined') ? getLocalRef(item.$ref, definitions) : item;
+
+      result = merge(result, item);
+    }
+
+    return result;
+  };
+
+
+  /**
+   * returns a object that built with default values from json schema
+   *
+   * @param {Object} schema
+   * @param {Object} definitions
+   * @return {Object}
+   */
+  var defaults = function(schema, definitions) {
+
+    if (typeof schema['default'] !== 'undefined') {
+
+      return schema['default'];
+
+    } else if (typeof schema.allOf !== 'undefined') {
+
+      var mergedItem = mergeAllOf(schema.allOf, definitions);
+      return defaults(mergedItem, definitions);
+
+    } else if (typeof schema.$ref !== 'undefined') {
+
+      var reference = getLocalRef(schema.$ref, definitions);
+      return defaults(reference, definitions);
+
+    } else if (schema.type === 'object') {
+
+      if (!schema.properties) { return {}; }
+
+      for (var key in schema.properties) {
+        if (schema.properties.hasOwnProperty(key)) {
+          schema.properties[key] = defaults(schema.properties[key], definitions);
+
+          if (typeof schema.properties[key] === 'undefined') {
+            delete schema.properties[key];
+          }
+        }
+      }
+
+      return schema.properties;
+
+    } else if (schema.type === 'array') {
+
+      if (!schema.items) { return []; }
+      return [defaults(schema.items, definitions)];
+
+    }
+
+  };
+
+  /**
+   * main function
+   *
+   * @param {Object} schema
+   * @param {Object|undefined} definitions
+   * @return {Object}
+   */
+  return function (schema, definitions) {
+
+    if (typeof definitions === 'undefined') {
+      definitions = schema.definitions || {};
+    } else if (isObject(schema.definitions)) {
+      definitions = merge(definitions, schema.definitions);
+    }
+
+    return defaults(cloneJSON(schema), definitions);
+  };
+
+}));
+
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
     define(['angular', 'objectpath', 'tv4'], factory);

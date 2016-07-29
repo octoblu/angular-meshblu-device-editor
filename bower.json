@@ -26,10 +26,18 @@
     "octoblu-device-schema-transmogrifier": "^6.1.0",
     "lodash": "3.10.0",
     "json-schema-ref-parser": "^3.1.2",
-    "meshblu-json-schema-resolver": "^1.0.4"
+    "meshblu-json-schema-resolver": "^1.0.4",
+    "json-schema-defaults": "^0.1.1"
   },
   "resolutions": {
     "angular": "1.3",
     "lodash": "3.10.1"
+  },
+  "overrides": {
+    "json-schema-defaults": {
+      "main": [
+        "./lib/defaults.js"
+      ]
+    }
   }
 }

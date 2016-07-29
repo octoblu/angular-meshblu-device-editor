@@ -10,4 +10,5 @@ window
     device: '='
     model: '='
     meshbluConfig: '='
+    confirmSchemaChangeFn: '='
 }

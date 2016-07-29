@@ -1,18 +1,28 @@
-{_, angular, MeshbluJsonSchemaResolver} = window
+{_, angular, MeshbluJsonSchemaResolver, jsonSchemaDefaults} = window
 
 class ConfigureSchemaContainer
   constructor: (@scope) ->
     @meshbluJsonSchemaResolver = new MeshbluJsonSchemaResolver {meshbluConfig: @scope.meshbluConfig}
     @scope.formSchemas ?= {}
+    @scope.draft = _.cloneDeep @scope.model
     @scope.$watch 'schemas', @resolveSchemas
     @scope.$watch 'formSchemas', @resolveFormSchemas
     @scope.$watch 'resolvedSchemas', @setAvailableSchemas
     @scope.$watch 'resolvedFormSchemas', @setAvailableSchemas
-    @scope.$watch 'model.schemas.selected.configure', (theNew, theOld) =>
+    @scope.$watch 'draft.schemas.selected.configure', (theNew, theOld) =>
+      return if _.get(@scope.draft, 'schemas.selected.configure') == _.get(@scope.model, 'schemas.selected.configure')
       return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
-      @scope.schema = @schema()
-      @scope.formSchema = @formSchema()
-      @scope.isEmpty = @isEmpty()
+      confirmChangeFn = @scope.confirmSchemaChangeFn ? @_defaultConfirmSchemaChange
+      confirmChangeFn (confirmed) =>
+        unless confirmed
+          _.set @scope.draft, 'schemas.selected.configure', theOld
+          return
+        _.set @scope.model, 'schemas.selected.configure', theNew
+        @scope.schema = @schema()
+        @scope.formSchema = @formSchema()
+        @scope.isEmpty = @isEmpty()
+        defaults = jsonSchemaDefaults @scope.schema
+        _.extend @scope.model, defaults
 
   availableSchemas: =>
     _.compact @schemaKeys().map (key) =>
@@ -69,6 +79,9 @@ class ConfigureSchemaContainer
     @scope.schema = @schema()
     @scope.formSchema = @formSchema()
     @scope.isEmpty = @isEmpty()
+
+  _defaultConfirmSchemaChange: (callback) =>
+    callback true
 
 window
 .angular
