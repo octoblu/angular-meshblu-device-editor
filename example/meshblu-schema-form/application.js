@@ -1,7 +1,7 @@
 'use strict';
 angular.module('example', ['angular-meshblu-device-editor']);
 
-angular.module('example').controller('ExampleSchemaRenderController', function($scope, $timeout){
+angular.module('example').controller('ExampleMeshbluSchemaFormController', function($scope, $timeout){
 
   this.device = {
     schemas: {

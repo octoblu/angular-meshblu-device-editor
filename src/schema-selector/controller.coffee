@@ -11,6 +11,7 @@ class SchemaSelectorController
       confirmChangeFn (confirmed) =>
         @scope._selectedSchema = theOld unless confirmed
         @scope.selectedSchema = @scope._selectedSchema?.key if @scope.selectedSchema?
+
   availableSchemas: =>
     _.compact @schemaKeys().map (key) =>
       schema = @scope.schemas?[key]

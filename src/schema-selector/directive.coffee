@@ -9,5 +9,5 @@ window
   scope:
     selectedSchema: '='
     schemas: '='
-    confirmSchemaChangeFn: '='
+    confirmSchemaChangeFn: '='    
 }
