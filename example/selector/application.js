@@ -1,9 +1,9 @@
 'use strict';
 angular.module('example', ['angular-meshblu-device-editor']);
 
-angular.module('example').controller('ExampleSchemaSelectorController', function($timeout){
+angular.module('example').controller('ExampleSchemaSelectorController', function($scope, $timeout){
   this.schemas = {
-    "default": {
+    "Default": {
       title: "Default",
       type: "object",
       properties: {
@@ -33,5 +33,8 @@ angular.module('example').controller('ExampleSchemaSelectorController', function
       }
     }
   }
-  this.selectedSchema = 'advanced-config';
+  this.selectedSchema = '';
+  this.confirmSchemaChangeFn = function(callback){
+    callback(confirm('Do you want to change this?'));
+  };
 });

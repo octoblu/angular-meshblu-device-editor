@@ -4,16 +4,13 @@ class SchemaSelectorController
   constructor: (@scope) ->
     @scope.availableSchemas = @availableSchemas()
     @scope._selectedSchema = @selectedSchemaKey()
-    console.log @scope._selectedSchema
+    @scope.selectedSchema = @scope._selectedSchema?.key if @scope.selectedSchema?
     @scope.$watch '_selectedSchema', (theNew, theOld) =>
-
-      return if theNew == theOld || !theNew?
+      return if theNew.key == @scope.selectedSchema
       confirmChangeFn = @scope.confirmSchemaChangeFn ? @_defaultConfirmSchemaChange
       confirmChangeFn (confirmed) =>
-        console.log confirmed, @scope._selectedSchema
         @scope._selectedSchema = theOld unless confirmed
-        @scope.selectedSchema = @scope._selectedSchema if @scope.selectedSchema?
-
+        @scope.selectedSchema = @scope._selectedSchema?.key if @scope.selectedSchema?
   availableSchemas: =>
     _.compact @schemaKeys().map (key) =>
       schema = @scope.schemas?[key]
@@ -26,7 +23,11 @@ class SchemaSelectorController
     _.keys @scope.schemas
 
   selectedSchemaKey: =>
-    return @scope.selectedSchema || _.first @scope.availableSchemas
+    schema = _.find @scope.availableSchemas, key: @scope.selectedSchema
+    return schema if schema?
+    schema = _.find @scope.availableSchemas, key: 'Default'
+    return schema if schema?
+    return _.first @scope.availableSchemas
 
   _defaultConfirmSchemaChange: (callback) =>
     callback true

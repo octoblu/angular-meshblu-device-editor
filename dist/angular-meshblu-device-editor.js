@@ -504,6 +504,7 @@
 
   SchemaSelectorController = (function() {
     function SchemaSelectorController(scope) {
+      var ref;
       this.scope = scope;
       this._defaultConfirmSchemaChange = bind(this._defaultConfirmSchemaChange, this);
       this.selectedSchemaKey = bind(this.selectedSchemaKey, this);
@@ -511,21 +512,23 @@
       this.availableSchemas = bind(this.availableSchemas, this);
       this.scope.availableSchemas = this.availableSchemas();
       this.scope._selectedSchema = this.selectedSchemaKey();
-      console.log(this.scope._selectedSchema);
+      if (this.scope.selectedSchema != null) {
+        this.scope.selectedSchema = (ref = this.scope._selectedSchema) != null ? ref.key : void 0;
+      }
       this.scope.$watch('_selectedSchema', (function(_this) {
         return function(theNew, theOld) {
-          var confirmChangeFn, ref;
-          if (theNew === theOld || (theNew == null)) {
+          var confirmChangeFn, ref1;
+          if (theNew.key === _this.scope.selectedSchema) {
             return;
           }
-          confirmChangeFn = (ref = _this.scope.confirmSchemaChangeFn) != null ? ref : _this._defaultConfirmSchemaChange;
+          confirmChangeFn = (ref1 = _this.scope.confirmSchemaChangeFn) != null ? ref1 : _this._defaultConfirmSchemaChange;
           return confirmChangeFn(function(confirmed) {
-            console.log(confirmed, _this.scope._selectedSchema);
+            var ref2;
             if (!confirmed) {
               _this.scope._selectedSchema = theOld;
             }
             if (_this.scope.selectedSchema != null) {
-              return _this.scope.selectedSchema = _this.scope._selectedSchema;
+              return _this.scope.selectedSchema = (ref2 = _this.scope._selectedSchema) != null ? ref2.key : void 0;
             }
           });
         };
@@ -556,7 +559,20 @@
     };
 
     SchemaSelectorController.prototype.selectedSchemaKey = function() {
-      return this.scope.selectedSchema || _.first(this.scope.availableSchemas);
+      var schema;
+      schema = _.find(this.scope.availableSchemas, {
+        key: this.scope.selectedSchema
+      });
+      if (schema != null) {
+        return schema;
+      }
+      schema = _.find(this.scope.availableSchemas, {
+        key: 'Default'
+      });
+      if (schema != null) {
+        return schema;
+      }
+      return _.first(this.scope.availableSchemas);
     };
 
     SchemaSelectorController.prototype._defaultConfirmSchemaChange = function(callback) {
@@ -588,8 +604,149 @@
 
 }).call(this);
 
+(function() {
+  var SchemaRenderController, _, angular, jsonSchemaDefaults,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  _ = window._, angular = window.angular, jsonSchemaDefaults = window.jsonSchemaDefaults;
+
+  SchemaRenderController = (function() {
+    function SchemaRenderController(scope) {
+      var base, base1;
+      this.scope = scope;
+      this.setSchema = bind(this.setSchema, this);
+      this.schema = bind(this.schema, this);
+      this.formSchema = bind(this.formSchema, this);
+      if ((base = this.scope).formSchemas == null) {
+        base.formSchemas = {};
+      }
+      if ((base1 = this.scope).model == null) {
+        base1.model = {};
+      }
+      this.setSchema();
+    }
+
+    SchemaRenderController.prototype.formSchema = function() {
+      var key, ref, schema;
+      schema = this.schema();
+      key = schema != null ? (ref = schema['x-form-schema']) != null ? ref.angular : void 0 : void 0;
+      if (key == null) {
+        return ['*'];
+      }
+      return _.get(this.scope.formSchemas, key);
+    };
+
+    SchemaRenderController.prototype.schema = function() {
+      var ref;
+      return (ref = this.scope.schemas) != null ? ref[this.scope.selectedSchema] : void 0;
+    };
+
+    SchemaRenderController.prototype.setSchema = function() {
+      this.scope.schema = this.schema();
+      return this.scope.formSchema = this.formSchema();
+    };
+
+    return SchemaRenderController;
+
+  })();
+
+  window.angular.module('angular-meshblu-device-editor').controller('SchemaRenderController', ['$scope', SchemaRenderController]);
+
+}).call(this);
+
+(function() {
+  window.angular.module('angular-meshblu-device-editor').directive('schemaRender', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'schema-render/template.html',
+      replace: true,
+      controller: 'SchemaRenderController',
+      scope: {
+        selectedSchema: '=',
+        schemas: '=',
+        formSchemas: '=',
+        model: '='
+      }
+    };
+  });
+
+}).call(this);
+
+(function() {
+  var OctobluDeviceSchemaTransmogrifier, SchemaTransmogrifyController, _, angular;
+
+  _ = window._, angular = window.angular, OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
+
+  SchemaTransmogrifyController = (function() {
+    function SchemaTransmogrifyController(scope) {
+      this.scope = scope;
+      ({
+        constructor: function(scope1) {
+          this.scope = scope1;
+          return this.scope.$watch('device', this.setSchemas);
+        },
+        getConfigureFormSchemas: (function(_this) {
+          return function() {
+            var transmogrified;
+            transmogrified = _this.getTransmogrified();
+            return transmogrified.schemas.form;
+          };
+        })(this),
+        getConfigureSchemas: (function(_this) {
+          return function() {
+            var transmogrified;
+            transmogrified = _this.getTransmogrified();
+            return transmogrified.schemas.configure;
+          };
+        })(this),
+        getTransmogrified: (function(_this) {
+          return function() {
+            var transmogrifier;
+            transmogrifier = new OctobluDeviceSchemaTransmogrifier(_this.scope.device);
+            return transmogrifier.transmogrify();
+          };
+        })(this),
+        setSchemas: (function(_this) {
+          return function() {
+            if (!_this.scope.device) {
+              return;
+            }
+            _this.scope.schemas = _this.getConfigureSchemas();
+            _this.scope.formSchemas = _this.getConfigureFormSchemas();
+            return _this.scope.hasSchemas = !_.isEmpty(_this.scope.schemas);
+          };
+        })(this)
+      });
+    }
+
+    return SchemaTransmogrifyController;
+
+  })();
+
+  window.angular.module('angular-meshblu-device-editor').controller('SchemaTransmogrifyController', ['$scope', SchemaTransmogrifyController]);
+
+}).call(this);
+
+(function() {
+  window.angular.module('angular-meshblu-device-editor').directive('schemaTransmogrify', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'schema-transmogrify/template.html',
+      replace: true,
+      controller: 'SchemaTransmogrifyController',
+      scope: {
+        device: '=',
+        model: '='
+      }
+    };
+  });
+
+}).call(this);
+
 angular.module("angular-meshblu-device-editor").run(["$templateCache", function($templateCache) {$templateCache.put("configure-schema-container/template.html","<div>\n  <div class=\"alert alert-danger\" ng-show=\"errorFormSchema\">Error resolving form schema</div>\n  <div class=\"alert alert-danger\" ng-show=\"errorSchema\">Error resolving configure schema</div>\n\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1 || errorSchema || errorFormSchema\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Configure Type</label>\n    <select\n      ng-options=\"option.title group by option.group for option in availableSchemas track by option.key\"\n      ng-model=\"selectedSchema\"\n      name=\"selected-schema-key\"\n      class=\"form-control\"></select>\n  </div>\n  <div ng-if=\"!isEmpty\">\n    <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"model\"></form>\n  </div>\n</div>\n");
 $templateCache.put("device-configure-schema-container/template.html","<div>\n  <h4 ng-hide=\"hasSchemas\"><small>Device does not contain a configure schema.</small></h4>\n\n  <configure-schema-container\n    ng-show=\"hasSchemas\"\n    model=\"model\"\n    schemas=\"schemas\"\n    meshblu-config=\"meshbluConfig\"\n    form-schemas=\"formSchemas\"\n    confirm-schema-change-fn=\"confirmSchemaChangeFn\"></configure-schema-container>\n</div>\n");
 $templateCache.put("device-message-schema-container/template.html","<div>\n  <h4 ng-hide=\"hasSchemas\"><small>Device does not contain a message schema.</small></h4>\n\n  <message-schema-container\n    ng-show=\"hasSchemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    meshblu-config=\"meshbluConfig\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
 $templateCache.put("message-schema-container/template.html","<div>\n  <div class=\"alert alert-danger\" ng-show=\"errorFormSchema\">Error resolving form schema</div>\n  <div class=\"alert alert-danger\" ng-show=\"errorSchema\">Error resolving message schema</div>\n\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1 || errorSchema || errorFormSchema\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Message Type</label>\n    <select\n      ng-options=\"option.key as option.title group by option.group for option in availableSchemas\"\n      ng-model=\"selectedSchemaKey\"\n      name=\"selected-schema-key\"\n      class=\"form-control\" ></select>\n  </div>\n\n  <div ng-if=\"!isEmpty\">\n    <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"message\"></form>\n  </div>\n</div>\n");
-$templateCache.put("schema-selector/template.html","<div>\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Configure Type</label>\n    <pre> {{schemas | json}}</pre>\n    <select\n      ng-options=\"option.title group by option.group for option in availableSchemas track by option.key\"\n      ng-model=\"_selectedSchema\"\n      name=\"selected-schema-key\"\n      class=\"form-control\"></select>\n  </div>\n</div>\n");}]);
+$templateCache.put("schema-selector/template.html","<div>\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Configure Type</label>\n    <pre> {{schemas | json}}</pre>\n    <select\n      ng-options=\"option.title group by option.group for option in availableSchemas track by option.key\"\n      ng-model=\"_selectedSchema\"\n      name=\"selected-schema-key\"\n      class=\"form-control\"></select>\n  </div>\n</div>\n");
+$templateCache.put("schema-render/template.html","<div>\n  <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"model\"></form>\n</div>\n");
+$templateCache.put("schema-transmogrify/template.html","<div>\n  <schema-render\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    selected-schema=\"selectedSchema\"\n    model=\"model\">\n  </schema-render>\n</div>\n");}]);
