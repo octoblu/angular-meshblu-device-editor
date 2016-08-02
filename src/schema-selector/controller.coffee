@@ -2,15 +2,24 @@
 
 class SchemaSelectorController
   constructor: (@scope) ->
-    @scope.availableSchemas = @availableSchemas()
-    @scope.selectedSchema = @getSelectedSchema()    
+    @updateAvailableSchemas()
+
     @scope.selectedSchemaKey = @scope.selectedSchema?.key
+
+    @scope.$watch 'schemas', @updateAvailableSchemas
+
     @scope.$watch 'selectedSchema', (theNew, theOld) =>
-      return if theNew?.key == @scope.selectedSchemaKey
+      return unless theNew?
+      return if theNew.key == @scope.selectedSchemaKey
       confirmChangeFn = @scope.confirmSchemaChangeFn ? @_defaultConfirmSchemaChange
       confirmChangeFn (confirmed) =>
         @scope.selectedSchema = theOld unless confirmed
         @scope.selectedSchemaKey = @scope.selectedSchema?.key
+
+
+  updateAvailableSchemas: =>
+    @scope.availableSchemas = @availableSchemas()
+    @scope.selectedSchema = @getSelectedSchema()
 
   availableSchemas: =>
     _.compact @schemaKeys().map (key) =>

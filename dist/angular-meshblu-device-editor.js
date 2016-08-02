@@ -266,75 +266,6 @@
 }).call(this);
 
 (function() {
-  var DeviceMessageSchemaContainer, OctobluDeviceSchemaTransmogrifier, _,
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  _ = window._, OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
-
-  DeviceMessageSchemaContainer = (function() {
-    function DeviceMessageSchemaContainer(scope) {
-      this.scope = scope;
-      this.setSchemas = bind(this.setSchemas, this);
-      this.getTransmogrified = bind(this.getTransmogrified, this);
-      this.getMessageSchemas = bind(this.getMessageSchemas, this);
-      this.getMessageFormSchemas = bind(this.getMessageFormSchemas, this);
-      this.scope.$watch('device', this.setSchemas);
-    }
-
-    DeviceMessageSchemaContainer.prototype.getMessageFormSchemas = function() {
-      var transmogrified;
-      transmogrified = this.getTransmogrified();
-      return transmogrified.schemas.form;
-    };
-
-    DeviceMessageSchemaContainer.prototype.getMessageSchemas = function() {
-      var transmogrified;
-      transmogrified = this.getTransmogrified();
-      return transmogrified.schemas.message;
-    };
-
-    DeviceMessageSchemaContainer.prototype.getTransmogrified = function() {
-      var transmogrifier;
-      transmogrifier = new OctobluDeviceSchemaTransmogrifier(this.scope.device);
-      return transmogrifier.transmogrify();
-    };
-
-    DeviceMessageSchemaContainer.prototype.setSchemas = function() {
-      if (!this.scope.device) {
-        return;
-      }
-      this.scope.schemas = this.getMessageSchemas();
-      this.scope.formSchemas = this.getMessageFormSchemas();
-      return this.scope.hasSchemas = !_.isEmpty(this.scope.schemas);
-    };
-
-    return DeviceMessageSchemaContainer;
-
-  })();
-
-  window.angular.module('angular-meshblu-device-editor').controller('DeviceMessageSchemaContainer', ['$scope', DeviceMessageSchemaContainer]);
-
-}).call(this);
-
-(function() {
-  window.angular.module('angular-meshblu-device-editor').directive('deviceMessageSchemaContainer', function() {
-    return {
-      restrict: 'E',
-      templateUrl: 'device-message-schema-container/template.html',
-      replace: true,
-      controller: 'DeviceMessageSchemaContainer',
-      scope: {
-        device: '=',
-        message: '=',
-        selectedSchemaKey: '=',
-        meshbluConfig: '='
-      }
-    };
-  });
-
-}).call(this);
-
-(function() {
   var MeshbluJsonSchemaResolver, MeshbluSchemaFormController, _, angular, jsonSchemaDefaults,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -452,13 +383,85 @@
 }).call(this);
 
 (function() {
-  var MeshbluJsonSchemaResolver, MessageSchemaContainer, _, angular;
+  var DeviceMessageSchemaContainer, OctobluDeviceSchemaTransmogrifier, _,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  _ = window._, OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
+
+  DeviceMessageSchemaContainer = (function() {
+    function DeviceMessageSchemaContainer(scope) {
+      this.scope = scope;
+      this.setSchemas = bind(this.setSchemas, this);
+      this.getTransmogrified = bind(this.getTransmogrified, this);
+      this.getMessageSchemas = bind(this.getMessageSchemas, this);
+      this.getMessageFormSchemas = bind(this.getMessageFormSchemas, this);
+      this.scope.$watch('device', this.setSchemas);
+    }
+
+    DeviceMessageSchemaContainer.prototype.getMessageFormSchemas = function() {
+      var transmogrified;
+      transmogrified = this.getTransmogrified();
+      return transmogrified.schemas.form;
+    };
+
+    DeviceMessageSchemaContainer.prototype.getMessageSchemas = function() {
+      var transmogrified;
+      transmogrified = this.getTransmogrified();
+      return transmogrified.schemas.message;
+    };
+
+    DeviceMessageSchemaContainer.prototype.getTransmogrified = function() {
+      var transmogrifier;
+      transmogrifier = new OctobluDeviceSchemaTransmogrifier(this.scope.device);
+      return transmogrifier.transmogrify();
+    };
+
+    DeviceMessageSchemaContainer.prototype.setSchemas = function() {
+      if (!this.scope.device) {
+        return;
+      }
+      this.scope.schemas = this.getMessageSchemas();
+      this.scope.formSchemas = this.getMessageFormSchemas();
+      return this.scope.hasSchemas = !_.isEmpty(this.scope.schemas);
+    };
+
+    return DeviceMessageSchemaContainer;
+
+  })();
+
+  window.angular.module('angular-meshblu-device-editor').controller('DeviceMessageSchemaContainer', ['$scope', DeviceMessageSchemaContainer]);
+
+}).call(this);
+
+(function() {
+  window.angular.module('angular-meshblu-device-editor').directive('deviceMessageSchemaContainer', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'device-message-schema-container/template.html',
+      replace: true,
+      controller: 'DeviceMessageSchemaContainer',
+      scope: {
+        device: '=',
+        message: '=',
+        selectedSchemaKey: '=',
+        meshbluConfig: '='
+      }
+    };
+  });
+
+}).call(this);
+
+(function() {
+  var MeshbluJsonSchemaResolver, MessageSchemaContainer, _, angular,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   _ = window._, angular = window.angular, MeshbluJsonSchemaResolver = window.MeshbluJsonSchemaResolver;
 
   MessageSchemaContainer = (function() {
     function MessageSchemaContainer(scope) {
       this.scope = scope;
+      this.isEmpty = bind(this.isEmpty, this);
+      this.scope.isEmpty = this.isEmpty();
       this.scope.$watch('selectedSchemaKey', (function(_this) {
         return function(newSelectedSchemaKey) {
           return console.log({
@@ -467,6 +470,14 @@
         };
       })(this));
     }
+
+    MessageSchemaContainer.prototype.isEmpty = function() {
+      var ref, ref1;
+      if (((ref = this.scope.schema) != null ? ref.type : void 0) === 'object' && _.isEmpty((ref1 = this.scope.schema) != null ? ref1.properties : void 0)) {
+        return true;
+      }
+      return false;
+    };
 
     return MessageSchemaContainer;
 
@@ -510,13 +521,17 @@
       this.getSelectedSchema = bind(this.getSelectedSchema, this);
       this.schemaKeys = bind(this.schemaKeys, this);
       this.availableSchemas = bind(this.availableSchemas, this);
-      this.scope.availableSchemas = this.availableSchemas();
-      this.scope.selectedSchema = this.getSelectedSchema();
+      this.updateAvailableSchemas = bind(this.updateAvailableSchemas, this);
+      this.updateAvailableSchemas();
       this.scope.selectedSchemaKey = (ref = this.scope.selectedSchema) != null ? ref.key : void 0;
+      this.scope.$watch('schemas', this.updateAvailableSchemas);
       this.scope.$watch('selectedSchema', (function(_this) {
         return function(theNew, theOld) {
           var confirmChangeFn, ref1;
-          if ((theNew != null ? theNew.key : void 0) === _this.scope.selectedSchemaKey) {
+          if (theNew == null) {
+            return;
+          }
+          if (theNew.key === _this.scope.selectedSchemaKey) {
             return;
           }
           confirmChangeFn = (ref1 = _this.scope.confirmSchemaChangeFn) != null ? ref1 : _this._defaultConfirmSchemaChange;
@@ -530,6 +545,11 @@
         };
       })(this));
     }
+
+    SchemaSelectorController.prototype.updateAvailableSchemas = function() {
+      this.scope.availableSchemas = this.availableSchemas();
+      return this.scope.selectedSchema = this.getSelectedSchema();
+    };
 
     SchemaSelectorController.prototype.availableSchemas = function() {
       return _.compact(this.schemaKeys().map((function(_this) {
@@ -673,8 +693,8 @@
 
 angular.module("angular-meshblu-device-editor").run(["$templateCache", function($templateCache) {$templateCache.put("configure-schema-container/template.html","<div>\n  <div class=\"alert alert-danger\" ng-show=\"errorFormSchema\">Error resolving form schema</div>\n  <div class=\"alert alert-danger\" ng-show=\"errorSchema\">Error resolving configure schema</div>\n\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1 || errorSchema || errorFormSchema\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Configure Type</label>\n    <select\n      ng-options=\"option.title group by option.group for option in availableSchemas track by option.key\"\n      ng-model=\"selectedSchema\"\n      name=\"selected-schema-key\"\n      class=\"form-control\"></select>\n  </div>\n  <div ng-if=\"!isEmpty\">\n    <form sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"model\"></form>\n  </div>\n</div>\n");
 $templateCache.put("device-configure-schema-container/template.html","<div>\n  <h4 ng-hide=\"hasSchemas\"><small>Device does not contain a configure schema.</small></h4>\n\n  <configure-schema-container\n    ng-show=\"hasSchemas\"\n    model=\"model\"\n    schemas=\"schemas\"\n    meshblu-config=\"meshbluConfig\"\n    form-schemas=\"formSchemas\"\n    confirm-schema-change-fn=\"confirmSchemaChangeFn\"></configure-schema-container>\n</div>\n");
-$templateCache.put("device-message-schema-container/template.html","<div>\n  <h4 ng-hide=\"hasSchemas\"><small>Device does not contain a message schema.</small></h4>\n\n  <message-schema-container\n    ng-show=\"hasSchemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    meshblu-config=\"meshbluConfig\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
 $templateCache.put("meshblu-schema-form/template.html","<div>\n  <form ng-if=\"!isEmpty\" sf-schema=\"schema\" sf-form=\"formSchema\" sf-model=\"model\"></form>\n</div>\n");
-$templateCache.put("message-schema-container/template.html","<div>\n  <schema-selector\n    schemas=\"schemas\"\n    selected-schema-key=\"selectedSchemaKey\"\n  >\n  </schema-selector>\n  <meshblu-schema-form\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    selected-schema-key=\"selectedSchemaKey\"\n    meshbluConfig=\"meshbluConfig\"\n    model=\"message\">\n  </meshblu-schema-form>\n</div>\n");
+$templateCache.put("device-message-schema-container/template.html","<div>\n  <h4 ng-hide=\"hasSchemas\"><small>Device does not contain a message schema.</small></h4>\n\n  <message-schema-container\n    ng-show=\"hasSchemas\"\n    message=\"message\"\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    meshblu-config=\"meshbluConfig\"\n    selected-schema-key=\"selectedSchemaKey\" ></message-schema-container>\n</div>\n");
+$templateCache.put("message-schema-container/template.html","<div>\n  <div ng-hide=\"isEmpty\">\n    <schema-selector\n      schemas=\"schemas\"\n      selected-schema-key=\"selectedSchemaKey\"\n    >\n    </schema-selector>\n    <meshblu-schema-form\n      schemas=\"schemas\"\n      form-schemas=\"formSchemas\"\n      selected-schema-key=\"selectedSchemaKey\"\n      meshbluConfig=\"meshbluConfig\"\n      model=\"message\">\n    </meshblu-schema-form>\n  </div>\n</div>\n");
 $templateCache.put("schema-selector/template.html","<div>\n  <div class=\"form-group\" ng-hide=\"availableSchemas.length == 1\">\n    <label class=\"control-label\" for=\"selected-schema-key\">Configure Type</label>\n    <pre> {{schemas | json}}</pre>\n    <select\n      ng-options=\"option.title group by option.group for option in availableSchemas track by option.key\"\n      ng-model=\"selectedSchema\"\n      name=\"selected-schema-key\"\n      class=\"form-control\"></select>\n  </div>\n</div>\n");
 $templateCache.put("schema-transmogrify/template.html","<div>\n  <schema-form\n    schemas=\"schemas\"\n    form-schemas=\"formSchemas\"\n    selected-schema=\"selectedSchema\"\n    model=\"model\">\n  </schema-form>\n</div>\n");}]);
