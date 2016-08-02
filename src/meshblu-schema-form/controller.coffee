@@ -4,24 +4,24 @@ class MeshbluSchemaFormController
   constructor: (@scope) ->
     @meshbluJsonSchemaResolver = new MeshbluJsonSchemaResolver {meshbluConfig: @scope.meshbluConfig}
     @scope.formSchemas ?= {}
-    @selectSchema()
-
     @scope.$watch 'schemas', @resolveSchemas
     @scope.$watch 'formSchemas', @resolveFormSchemas
     @scope.$watch 'resolvedSchemas', @setAvailableSchemas
     @scope.$watch 'resolvedFormSchemas', @setAvailableSchemas
-    @scope.$watch 'selectedSchema', @selectSchema
+    @scope.$watch 'selectedSchemaKey', @selectSchema
 
-  selectSchema: =>
+  selectSchema: (newSchema) =>
     return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
-    @scope.schema = @schema()
+    return unless newSchema?
+    @scope.schema = @scope.resolvedSchemas?[newSchema]
     @scope.formSchema = @formSchema()
-    @scope.isEmpty = @isEmpty()
+    @scope.isEmpty = @isEmpty()    
     defaults = jsonSchemaDefaults @scope.schema
-    _.extend @scope.model, defaults
+    @scope.model = _.cloneDeep defaults
+    @scope.selectedSchemaKey = newSchema
 
   formSchema: =>
-    schema = @schema()
+    schema = @scope.resolvedSchemas?[@scope.selectedSchemaKey]
     key = schema?['x-form-schema']?.angular
     return ['*'] unless key?
     return _.get @scope.resolvedFormSchemas, key
@@ -30,21 +30,12 @@ class MeshbluSchemaFormController
     return true if @scope.schema?.type == 'object' && _.isEmpty @scope.schema?.properties
     return false
 
-  schema: =>
-    return @scope.resolvedSchemas?[@scope.selectedSchema]
-
-  schemaKeys: =>
-    _.keys @scope.resolvedSchemas
-
-  getSelected: =>
-    _.get @scope.model, 'schemas.selected.configure'
-
   resolveFormSchemas: =>
     return unless @scope.formSchemas?
     @meshbluJsonSchemaResolver.resolve @scope.formSchemas, (error, formSchemas) =>
       @scope.errorFormSchema = error
       @scope.resolvedFormSchemas = formSchemas
-      @selectSchema()
+      @selectSchema @scope.selectedSchemaKey
       @scope.$apply()
 
   resolveSchemas: =>
@@ -52,7 +43,7 @@ class MeshbluSchemaFormController
     @meshbluJsonSchemaResolver.resolve @scope.schemas, (error, schemas) =>
       @scope.errorSchema = error
       @scope.resolvedSchemas = schemas
-      @selectSchema()
+      @selectSchema @scope.selectedSchemaKey
       @scope.$apply()
 
 window

@@ -3,12 +3,6 @@ angular.module('example', ['angular-meshblu-device-editor']);
 
 angular.module('example').controller('ExampleSchemaSelectorController', function($scope, $timeout){
   this.schemas = {
-    "Default": {
-      title: "Default",
-      type: "object",
-      properties: {
-      }
-    },
     "advanced-config": {
       title: "Advanced Config",
       type: "object",
@@ -31,7 +25,12 @@ angular.module('example').controller('ExampleSchemaSelectorController', function
           required: ["name", "gender"],
         }
       }
-    }
+    },
+    "Default": {
+      title: "Default",
+      type: "object",
+      properties: {}
+    },
   }
   this.selectedSchema = '';
   this.confirmSchemaChangeFn = function(callback){

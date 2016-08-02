@@ -10,9 +10,12 @@
       <meshblu-schema-form
         schemas="controller.schemas"
         form-schemas="controller.formSchemas"
-        selected-schema="controller.selectedSchema"
+        selected-schema-key="controller.selectedSchemaKey"
         model="controller.model">
-      </meshblu-schema-form>      
+      </meshblu-schema-form>
+      <pre>
+        {{controller.model | json}}
+      </pre>
     </section>
 
     <script src="../../../dist/dependencies.js"></script>

@@ -7,7 +7,7 @@ window
   replace: true
   controller: 'SchemaSelectorController'
   scope:
-    selectedSchema: '='
+    selectedSchemaKey: '='
     schemas: '='
-    confirmSchemaChangeFn: '='    
+    confirmSchemaChangeFn: '='
 }

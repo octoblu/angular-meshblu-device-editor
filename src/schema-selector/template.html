@@ -4,7 +4,7 @@
     <pre> {{schemas | json}}</pre>
     <select
       ng-options="option.title group by option.group for option in availableSchemas track by option.key"
-      ng-model="_selectedSchema"
+      ng-model="selectedSchema"
       name="selected-schema-key"
       class="form-control"></select>
   </div>

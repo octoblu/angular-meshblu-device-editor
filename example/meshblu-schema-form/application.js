@@ -98,7 +98,7 @@ angular.module('example').controller('ExampleMeshbluSchemaFormController', funct
   };
   this.schemas = angular.copy(this.device.schemas.configure);
   this.formSchemas = angular.copy(this.device.schemas.form);
-  this.selectedSchema = 'robot';
+  this.selectedSchemaKey = 'robot';
   this.model = {};
 
   $scope.$watch('model', function(theNew, theOld){

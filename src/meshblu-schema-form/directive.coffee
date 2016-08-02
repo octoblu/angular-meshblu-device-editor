@@ -7,7 +7,7 @@ window
     replace: true
     controller: 'MeshbluSchemaFormController'
     scope:
-      selectedSchema: '='
+      selectedSchemaKey: '='
       schemas: '='
       formSchemas: '='
       meshbluConfig: '='

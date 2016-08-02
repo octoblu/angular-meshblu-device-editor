@@ -10,6 +10,7 @@ window
     formSchemas: '=?'
     message: '='
     schemas: '='
-    selectedSchemaKey: '='
     meshbluConfig: '='
+    selectedSchemaKey: '='
+    confirmSchemaChangeFn: '='
 }
