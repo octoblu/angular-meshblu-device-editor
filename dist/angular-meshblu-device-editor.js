@@ -25,10 +25,14 @@
       if ((base = this.scope).formSchemas == null) {
         base.formSchemas = {};
       }
+      this.initialSchemaKey = _.get(this.scope.model, 'schemas.selected.configure');
       this.scope.$watch('schemas', this.resolveSchemas);
       this.scope.$watch('formSchemas', this.resolveFormSchemas);
       this.scope.$watch('selectedSchemaKey', (function(_this) {
         return function(selectedSchemaKey) {
+          if (selectedSchemaKey == null) {
+            return;
+          }
           return _.set(_this.scope.model, 'schemas.selected.configure', selectedSchemaKey);
         };
       })(this));
@@ -53,6 +57,7 @@
       }
       return this.meshbluJsonSchemaResolver.resolve(this.scope.schemas, (function(_this) {
         return function(error, schemas) {
+          _this.scope.selectedSchemaKey = _this.initialSchemaKey;
           _this.scope.errorSchema = error;
           _this.scope.resolvedSchemas = schemas;
           return _this.scope.$apply();

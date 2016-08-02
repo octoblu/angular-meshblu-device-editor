@@ -4,9 +4,12 @@ class ConfigureSchemaContainer
   constructor: (@scope) ->
     @meshbluJsonSchemaResolver = new MeshbluJsonSchemaResolver {meshbluConfig: @scope.meshbluConfig}
     @scope.formSchemas ?= {}
+
+    @initialSchemaKey = _.get @scope.model, 'schemas.selected.configure'
     @scope.$watch 'schemas', @resolveSchemas
     @scope.$watch 'formSchemas', @resolveFormSchemas
     @scope.$watch 'selectedSchemaKey', (selectedSchemaKey) =>
+      return unless selectedSchemaKey?
       _.set @scope.model, 'schemas.selected.configure', selectedSchemaKey
 
 
@@ -19,7 +22,8 @@ class ConfigureSchemaContainer
 
   resolveSchemas: =>
     return unless @scope.schemas?
-    @meshbluJsonSchemaResolver.resolve @scope.schemas, (error, schemas) =>
+    @meshbluJsonSchemaResolver.resolve @scope.schemas, (error, schemas) =>      
+      @scope.selectedSchemaKey = @initialSchemaKey
       @scope.errorSchema = error
       @scope.resolvedSchemas = schemas
       @scope.$apply()
