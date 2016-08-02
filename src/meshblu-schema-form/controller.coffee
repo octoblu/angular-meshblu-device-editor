@@ -8,13 +8,12 @@ class MeshbluSchemaFormController
     @scope.$watch 'selectedSchemaKey', @selectSchema
 
   selectSchema: =>
-    console.log 'selectSchema', @scope
+    @scope.isEmpty = @isEmpty()
     return unless @scope.schemas? && @scope.formSchemas? && @scope.selectedSchemaKey?
 
     @scope.schema = @scope.schemas[@scope.selectedSchemaKey]
     @scope.formSchema = @formSchema()
 
-    @scope.isEmpty = @isEmpty()
     defaults = jsonSchemaDefaults @scope.schema unless @scope.isEmpty
     return _.defaults @scope.model, defaults unless @scope.clearOnChange
     @scope.model = defaults
@@ -26,7 +25,7 @@ class MeshbluSchemaFormController
     return _.get @scope.formSchemas, key
 
   isEmpty: =>
-    return true unless @scope.schema
+    return true unless @scope.schema?
     return true if @scope.schema?.type == 'object' && _.isEmpty @scope.schema?.properties
     return false
 

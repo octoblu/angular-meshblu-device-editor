@@ -10,6 +10,7 @@ class SchemaSelectorController
 
     @scope.$watch 'selectedSchema', (theNew, theOld) =>
       return unless theNew?
+      return @scope.selectedSchemaKey = theNew.key unless @scope.selectedSchemaKey?
       return if theNew.key == @scope.selectedSchemaKey
       confirmChangeFn = @scope.confirmSchemaChangeFn ? @_defaultConfirmSchemaChange
       confirmChangeFn (confirmed) =>
