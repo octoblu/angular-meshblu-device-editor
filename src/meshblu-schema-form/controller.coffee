@@ -8,6 +8,7 @@ class MeshbluSchemaFormController
     @scope.$watch 'selectedSchemaKey', @selectSchema
 
   selectSchema: =>
+    console.log @scope.schemas
     return unless @scope.schemas? && @scope.formSchemas? && @scope.selectedSchemaKey?
 
     @scope.schema = @scope.schemas[@scope.selectedSchemaKey]
