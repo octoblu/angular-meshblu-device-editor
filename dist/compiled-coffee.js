@@ -237,9 +237,9 @@
   _ = window._, angular = window.angular, jsonSchemaDefaults = window.jsonSchemaDefaults;
 
   MeshbluSchemaFormController = (function() {
-    function MeshbluSchemaFormController(scope) {
+    function MeshbluSchemaFormController(scope1) {
       var base;
-      this.scope = scope;
+      this.scope = scope1;
       this.isEmpty = bind(this.isEmpty, this);
       this.formSchema = bind(this.formSchema, this);
       this.selectSchema = bind(this.selectSchema, this);
@@ -253,7 +253,7 @@
 
     MeshbluSchemaFormController.prototype.selectSchema = function() {
       var defaults;
-      console.log(this.scope.schemas);
+      console.log('selectSchema', scope);
       if (!((this.scope.schemas != null) && (this.scope.formSchemas != null) && (this.scope.selectedSchemaKey != null))) {
         return;
       }
