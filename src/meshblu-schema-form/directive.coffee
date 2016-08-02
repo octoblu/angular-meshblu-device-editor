@@ -12,4 +12,5 @@ window
       formSchemas: '='
       meshbluConfig: '='
       model: '='
+      clearOnChange: '='
   }

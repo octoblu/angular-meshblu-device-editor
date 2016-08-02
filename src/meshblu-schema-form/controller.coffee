@@ -1,52 +1,34 @@
-{_, angular, MeshbluJsonSchemaResolver, jsonSchemaDefaults} = window
+{_, angular, jsonSchemaDefaults} = window
 
 class MeshbluSchemaFormController
   constructor: (@scope) ->
-    @meshbluJsonSchemaResolver = new MeshbluJsonSchemaResolver {meshbluConfig: @scope.meshbluConfig}
     @scope.formSchemas ?= {}
-    @scope.$watch 'schemas', @resolveSchemas
-    @scope.$watch 'formSchemas', @resolveFormSchemas
-    @scope.$watch 'resolvedSchemas', @setAvailableSchemas
-    @scope.$watch 'resolvedFormSchemas', @setAvailableSchemas
+    @scope.$watch 'schemas', @selectSchema
+    @scope.$watch 'formSchemas', @selectSchema
     @scope.$watch 'selectedSchemaKey', @selectSchema
 
-  selectSchema: (newSchema) =>
-    return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
-    return unless newSchema?
+  selectSchema: =>
+    return unless @scope.schemas? && @scope.formSchemas? && @scope.selectedSchemaKey?
 
-    @scope.schema = @scope.resolvedSchemas?[newSchema]
+    @scope.schema = @scope.schemas[@scope.selectedSchemaKey]
     @scope.formSchema = @formSchema()
+
     @scope.isEmpty = @isEmpty()
-    return if @scope.isEmpty
-    defaults = jsonSchemaDefaults @scope.schema
-    @scope.model = _.cloneDeep defaults
-    @scope.selectedSchemaKey = newSchema
+    defaults = jsonSchemaDefaults @scope.schema unless @scope.isEmpty
+
+    return _.extend @scope.model, defaults unless @scope.clearOnChange
+    @scope.model = {}
 
   formSchema: =>
-    schema = @scope.resolvedSchemas?[@scope.selectedSchemaKey]
+    schema = @scope.schemas?[@scope.selectedSchemaKey]
     key = schema?['x-form-schema']?.angular
     return ['*'] unless key?
-    return _.get @scope.resolvedFormSchemas, key
+    return _.get @scope.formSchemas, key
 
   isEmpty: =>
+    return true unless @scope.schema
     return true if @scope.schema?.type == 'object' && _.isEmpty @scope.schema?.properties
     return false
-
-  resolveFormSchemas: =>
-    return unless @scope.formSchemas?
-    @meshbluJsonSchemaResolver.resolve @scope.formSchemas, (error, formSchemas) =>
-      @scope.errorFormSchema = error
-      @scope.resolvedFormSchemas = formSchemas
-      @selectSchema @scope.selectedSchemaKey
-      @scope.$apply()
-
-  resolveSchemas: =>
-    return unless @scope.schemas?
-    @meshbluJsonSchemaResolver.resolve @scope.schemas, (error, schemas) =>
-      @scope.errorSchema = error
-      @scope.resolvedSchemas = schemas
-      @selectSchema @scope.selectedSchemaKey
-      @scope.$apply()
 
 window
   .angular

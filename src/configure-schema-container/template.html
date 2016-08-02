@@ -1,16 +1,16 @@
 <div>
-  <div class="alert alert-danger" ng-show="errorFormSchema">Error resolving form schema</div>
-  <div class="alert alert-danger" ng-show="errorSchema">Error resolving configure schema</div>
-
-  <div class="form-group" ng-hide="availableSchemas.length == 1 || errorSchema || errorFormSchema">
-    <label class="control-label" for="selected-schema-key">Configure Type</label>
-    <select
-      ng-options="option.title group by option.group for option in availableSchemas track by option.key"
-      ng-model="selectedSchema"
-      name="selected-schema-key"
-      class="form-control"></select>
-  </div>
-  <div ng-if="!isEmpty">
-    <form sf-schema="schema" sf-form="formSchema" sf-model="model"></form>
+  <div ng-hide="isEmpty">
+    <schema-selector
+      schemas="resolvedSchemas"
+      selected-schema-key="selectedSchemaKey"
+    >
+    </schema-selector>
+    <meshblu-schema-form
+      schemas="resolvedSchemas"
+      form-schemas="resolvedFormSchemas"
+      selected-schema-key="selectedSchemaKey"
+      meshblu-config="meshbluConfig"
+      model="model" >
+    </meshblu-schema-form>
   </div>
 </div>

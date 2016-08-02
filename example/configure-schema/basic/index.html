@@ -14,6 +14,9 @@
         formSchemas="controller.formSchemas"></configure-schema-container>
 
       <h3>Selected Schema: "{{controller.model.schemas.selected.configure}}"</h3>
+      <pre>
+        {{controller.model | json}}
+      </pre>
     </section>
 
     <hr>

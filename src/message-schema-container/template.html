@@ -1,15 +1,16 @@
 <div>
   <div ng-hide="isEmpty">
     <schema-selector
-      schemas="schemas"
+      schemas="resolvedSchemas"
       selected-schema-key="selectedSchemaKey"
     >
     </schema-selector>
     <meshblu-schema-form
-      schemas="schemas"
-      form-schemas="formSchemas"
+      schemas="resolvedSchemas"
+      form-schemas="resolvedFormSchemas"
       selected-schema-key="selectedSchemaKey"
-      meshbluConfig="meshbluConfig"
+      meshblu-config="meshbluConfig"
+      clear-on-change="true"
       model="message">
     </meshblu-schema-form>
   </div>
