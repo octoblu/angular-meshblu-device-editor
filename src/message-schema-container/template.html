@@ -1,4 +1,7 @@
 <div>
+  <div class="alert alert-danger" ng-show="errorFormSchema">Error resolving form schema</div>
+  <div class="alert alert-danger" ng-show="errorSchema">Error resolving configure schema</div>
+
   <div ng-hide="isEmpty">
     <schema-selector
       schemas="resolvedSchemas"
