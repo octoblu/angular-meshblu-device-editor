@@ -17,7 +17,7 @@ class MeshbluSchemaFormController
     defaults = jsonSchemaDefaults @scope.schema unless @scope.isEmpty
     console.log @scope.model, defaults
     return _.defaults @scope.model, defaults unless @scope.clearOnChange
-    @scope.model = {}
+    @scope.model = defaults
 
   formSchema: =>
     schema = @scope.schemas?[@scope.selectedSchemaKey]
