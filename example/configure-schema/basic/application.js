@@ -19,7 +19,8 @@ angular.module('example').controller('ExampleConfigureSchemaContainerController'
           properties: {
             name:  {
               title: "Name",
-              type: "string"
+              type: "string",
+              default: 'Bob'
             },
             gender:  {
               title: "Gender",
@@ -48,6 +49,9 @@ angular.module('example').controller('ExampleConfigureSchemaContainerController'
       selected: {
         configure: 'advanced-config'
       }
+    },
+    "human": {
+      "name": "Yo"
     }
   }
 });

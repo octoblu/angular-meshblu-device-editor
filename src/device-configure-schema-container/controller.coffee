@@ -2,6 +2,7 @@
 
 class DeviceConfigureSchemaContainer
   constructor: (@scope) ->
+    console.log 'DeviceConfigureSchemaContainer', @scope
     @scope.$watch 'device', @setSchemas
 
   getConfigureFormSchemas: =>
