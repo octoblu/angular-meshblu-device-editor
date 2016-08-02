@@ -105,7 +105,6 @@
       this.getTransmogrified = bind(this.getTransmogrified, this);
       this.getConfigureSchemas = bind(this.getConfigureSchemas, this);
       this.getConfigureFormSchemas = bind(this.getConfigureFormSchemas, this);
-      console.log('DeviceConfigureSchemaContainer', this.scope);
       this.scope.$watch('device', this.setSchemas);
     }
 
@@ -263,7 +262,6 @@
       if (!this.scope.isEmpty) {
         defaults = jsonSchemaDefaults(this.scope.schema);
       }
-      console.log(this.scope.model, defaults);
       if (!this.scope.clearOnChange) {
         return _.defaults(this.scope.model, defaults);
       }

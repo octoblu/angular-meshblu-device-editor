@@ -15,7 +15,6 @@ class MeshbluSchemaFormController
 
     @scope.isEmpty = @isEmpty()
     defaults = jsonSchemaDefaults @scope.schema unless @scope.isEmpty
-    console.log @scope.model, defaults
     return _.defaults @scope.model, defaults unless @scope.clearOnChange
     @scope.model = defaults
 

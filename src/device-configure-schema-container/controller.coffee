@@ -1,8 +1,7 @@
 {_, OctobluDeviceSchemaTransmogrifier} = window
 
 class DeviceConfigureSchemaContainer
-  constructor: (@scope) ->
-    console.log 'DeviceConfigureSchemaContainer', @scope
+  constructor: (@scope) ->    
     @scope.$watch 'device', @setSchemas
 
   getConfigureFormSchemas: =>
