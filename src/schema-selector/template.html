@@ -1,7 +1,6 @@
 <div>
   <div class="form-group" ng-hide="availableSchemas.length == 1">
-    <label class="control-label" for="selected-schema-key">Configure Type</label>
-    <pre> {{schemas | json}}</pre>
+    <label class="control-label" for="selected-schema-key">Configure Type</label>    
     <select
       ng-options="option.title group by option.group for option in availableSchemas track by option.key"
       ng-model="selectedSchema"

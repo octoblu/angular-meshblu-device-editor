@@ -10,12 +10,14 @@ class MeshbluSchemaFormController
     @scope.$watch 'resolvedFormSchemas', @setAvailableSchemas
     @scope.$watch 'selectedSchemaKey', @selectSchema
 
-  selectSchema: (newSchema) =>    
+  selectSchema: (newSchema) =>
     return unless @scope.resolvedSchemas? && @scope.resolvedFormSchemas?
     return unless newSchema?
+
     @scope.schema = @scope.resolvedSchemas?[newSchema]
     @scope.formSchema = @formSchema()
     @scope.isEmpty = @isEmpty()
+    return if @scope.isEmpty
     defaults = jsonSchemaDefaults @scope.schema
     @scope.model = _.cloneDeep defaults
     @scope.selectedSchemaKey = newSchema
