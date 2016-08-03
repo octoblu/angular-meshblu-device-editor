@@ -231,86 +231,10 @@
 }).call(this);
 
 (function() {
-  var MeshbluJsonSchemaResolver, MessageSchemaContainer, angular,
+  var MeshbluSchemaFormController, _, angular, jsen,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
-  angular = window.angular, MeshbluJsonSchemaResolver = window.MeshbluJsonSchemaResolver;
-
-  MessageSchemaContainer = (function() {
-    function MessageSchemaContainer(scope) {
-      var base;
-      this.scope = scope;
-      this.resolveSchemas = bind(this.resolveSchemas, this);
-      this.resolveFormSchemas = bind(this.resolveFormSchemas, this);
-      this.meshbluJsonSchemaResolver = new MeshbluJsonSchemaResolver({
-        meshbluConfig: this.scope.meshbluConfig
-      });
-      if ((base = this.scope).formSchemas == null) {
-        base.formSchemas = {};
-      }
-      this.scope.$watch('schemas', this.resolveSchemas);
-      this.scope.$watch('formSchemas', this.resolveFormSchemas);
-    }
-
-    MessageSchemaContainer.prototype.resolveFormSchemas = function() {
-      if (this.scope.formSchemas == null) {
-        return;
-      }
-      return this.meshbluJsonSchemaResolver.resolve(this.scope.formSchemas, (function(_this) {
-        return function(error, formSchemas) {
-          _this.scope.errorFormSchema = error;
-          _this.scope.resolvedFormSchemas = formSchemas;
-          return _this.scope.$apply();
-        };
-      })(this));
-    };
-
-    MessageSchemaContainer.prototype.resolveSchemas = function() {
-      if (this.scope.schemas == null) {
-        return;
-      }
-      return this.meshbluJsonSchemaResolver.resolve(this.scope.schemas, (function(_this) {
-        return function(error, schemas) {
-          _this.scope.errorSchema = error;
-          _this.scope.resolvedSchemas = schemas;
-          return _this.scope.$apply();
-        };
-      })(this));
-    };
-
-    return MessageSchemaContainer;
-
-  })();
-
-  window.angular.module('angular-meshblu-device-editor').controller('MessageSchemaContainer', ['$scope', MessageSchemaContainer]);
-
-}).call(this);
-
-(function() {
-  window.angular.module('angular-meshblu-device-editor').directive('messageSchemaContainer', function() {
-    return {
-      restrict: 'E',
-      templateUrl: 'message-schema-container/template.html',
-      replace: true,
-      controller: 'MessageSchemaContainer',
-      scope: {
-        formSchemas: '=?',
-        message: '=',
-        schemas: '=',
-        meshbluConfig: '=',
-        selectedSchemaKey: '=',
-        confirmSchemaChangeFn: '='
-      }
-    };
-  });
-
-}).call(this);
-
-(function() {
-  var MeshbluSchemaFormController, _, angular, jsonSchemaDefaults,
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  _ = window._, angular = window.angular, jsonSchemaDefaults = window.jsonSchemaDefaults;
+  _ = window._, angular = window.angular, jsen = window.jsen;
 
   MeshbluSchemaFormController = (function() {
     function MeshbluSchemaFormController(scope) {
@@ -328,20 +252,24 @@
     }
 
     MeshbluSchemaFormController.prototype.selectSchema = function() {
-      var defaults;
-      this.scope.isEmpty = this.isEmpty();
+      var validator, validatorOptions;
       if (!((this.scope.schemas != null) && (this.scope.formSchemas != null) && (this.scope.selectedSchemaKey != null))) {
         return;
       }
       this.scope.schema = this.scope.schemas[this.scope.selectedSchemaKey];
       this.scope.formSchema = this.formSchema();
-      if (!this.scope.isEmpty) {
-        defaults = jsonSchemaDefaults(this.scope.schema);
+      this.scope.isEmpty = this.isEmpty();
+      if (this.scope.isEmpty) {
+        return;
       }
-      if (!this.scope.clearOnChange) {
-        return _.defaults(this.scope.model, defaults);
+      validator = jsen(this.scope.schema);
+      validatorOptions = {};
+      if (this.scope.clearOnChange) {
+        validatorOptions = {
+          additionalProperties: false
+        };
       }
-      return this.scope.model = defaults;
+      return this.scope.model = validator.build(this.scope.model, validatorOptions);
     };
 
     MeshbluSchemaFormController.prototype.formSchema = function() {
@@ -356,7 +284,7 @@
 
     MeshbluSchemaFormController.prototype.isEmpty = function() {
       var ref, ref1;
-      if (this.scope.schema == null) {
+      if (!this.scope.schema) {
         return true;
       }
       if (((ref = this.scope.schema) != null ? ref.type : void 0) === 'object' && _.isEmpty((ref1 = this.scope.schema) != null ? ref1.properties : void 0)) {
@@ -502,6 +430,82 @@
       scope: {
         selectedSchemaKey: '=',
         schemas: '=',
+        confirmSchemaChangeFn: '='
+      }
+    };
+  });
+
+}).call(this);
+
+(function() {
+  var MeshbluJsonSchemaResolver, MessageSchemaContainer, angular,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  angular = window.angular, MeshbluJsonSchemaResolver = window.MeshbluJsonSchemaResolver;
+
+  MessageSchemaContainer = (function() {
+    function MessageSchemaContainer(scope) {
+      var base;
+      this.scope = scope;
+      this.resolveSchemas = bind(this.resolveSchemas, this);
+      this.resolveFormSchemas = bind(this.resolveFormSchemas, this);
+      this.meshbluJsonSchemaResolver = new MeshbluJsonSchemaResolver({
+        meshbluConfig: this.scope.meshbluConfig
+      });
+      if ((base = this.scope).formSchemas == null) {
+        base.formSchemas = {};
+      }
+      this.scope.$watch('schemas', this.resolveSchemas);
+      this.scope.$watch('formSchemas', this.resolveFormSchemas);
+    }
+
+    MessageSchemaContainer.prototype.resolveFormSchemas = function() {
+      if (this.scope.formSchemas == null) {
+        return;
+      }
+      return this.meshbluJsonSchemaResolver.resolve(this.scope.formSchemas, (function(_this) {
+        return function(error, formSchemas) {
+          _this.scope.errorFormSchema = error;
+          _this.scope.resolvedFormSchemas = formSchemas;
+          return _this.scope.$apply();
+        };
+      })(this));
+    };
+
+    MessageSchemaContainer.prototype.resolveSchemas = function() {
+      if (this.scope.schemas == null) {
+        return;
+      }
+      return this.meshbluJsonSchemaResolver.resolve(this.scope.schemas, (function(_this) {
+        return function(error, schemas) {
+          _this.scope.errorSchema = error;
+          _this.scope.resolvedSchemas = schemas;
+          return _this.scope.$apply();
+        };
+      })(this));
+    };
+
+    return MessageSchemaContainer;
+
+  })();
+
+  window.angular.module('angular-meshblu-device-editor').controller('MessageSchemaContainer', ['$scope', MessageSchemaContainer]);
+
+}).call(this);
+
+(function() {
+  window.angular.module('angular-meshblu-device-editor').directive('messageSchemaContainer', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'message-schema-container/template.html',
+      replace: true,
+      controller: 'MessageSchemaContainer',
+      scope: {
+        formSchemas: '=?',
+        message: '=',
+        schemas: '=',
+        meshbluConfig: '=',
+        selectedSchemaKey: '=',
         confirmSchemaChangeFn: '='
       }
     };

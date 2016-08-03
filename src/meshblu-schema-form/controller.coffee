@@ -1,4 +1,4 @@
-{_, angular, jsonSchemaDefaults} = window
+{_, angular, jsen} = window
 
 class MeshbluSchemaFormController
   constructor: (@scope) ->
@@ -8,15 +8,18 @@ class MeshbluSchemaFormController
     @scope.$watch 'selectedSchemaKey', @selectSchema
 
   selectSchema: =>
-    @scope.isEmpty = @isEmpty()
     return unless @scope.schemas? && @scope.formSchemas? && @scope.selectedSchemaKey?
 
     @scope.schema = @scope.schemas[@scope.selectedSchemaKey]
     @scope.formSchema = @formSchema()
 
-    defaults = jsonSchemaDefaults @scope.schema unless @scope.isEmpty
-    return _.defaults @scope.model, defaults unless @scope.clearOnChange
-    @scope.model = defaults
+    @scope.isEmpty = @isEmpty()
+
+    return if @scope.isEmpty
+    validator = jsen @scope.schema
+    validatorOptions = {}
+    validatorOptions = {additionalProperties: false} if @scope.clearOnChange
+    @scope.model = validator.build @scope.model, validatorOptions
 
   formSchema: =>
     schema = @scope.schemas?[@scope.selectedSchemaKey]
@@ -25,7 +28,7 @@ class MeshbluSchemaFormController
     return _.get @scope.formSchemas, key
 
   isEmpty: =>
-    return true unless @scope.schema?
+    return true unless @scope.schema
     return true if @scope.schema?.type == 'object' && _.isEmpty @scope.schema?.properties
     return false
 

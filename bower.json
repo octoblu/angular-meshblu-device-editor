@@ -27,7 +27,7 @@
     "lodash": "3.10.0",
     "json-schema-ref-parser": "^3.1.2",
     "meshblu-json-schema-resolver": "^1.0.4",
-    "json-schema-defaults": "^0.1.1"
+    "jsen": "^0.6.1"
   },
   "resolutions": {
     "angular": "1.3",

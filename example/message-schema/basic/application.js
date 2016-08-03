@@ -84,9 +84,9 @@ var OLD_DEVICE = {
 }
 
 angular.module('example').controller('ExampleMessageSchemaContainerController', function(){
-  this.message = {};
+  this.message = { gender:  'other'};
   this.schemas = angular.copy(DEVICE.schemas.message);
-  this.selectedSchemaKey = 'robot'
+  this.selectedSchemaKey = 'human'
 });
 
 angular.module('example').controller('ExampleDeviceMessageSchemaContainerController', function(){
@@ -104,17 +104,17 @@ angular.module('example').controller('ExampleV2DeviceMessageSchemaContainerContr
 });
 
 angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerController', ['$timeout', function($timeout){
-  var self = this;
-
-  self.message = {};
-  self.device = {};
-
-  $timeout(function(){
-    self.device = angular.copy(OLD_DEVICE);
-  }, 100);
+  // var self = this;
+  //
+  // self.message = {};
+  // self.device = {};
+  //
+  // $timeout(function(){
+  //   self.device = angular.copy(OLD_DEVICE);
+  // }, 100);
 }]);
 
 angular.module('example').controller('ExampleEmptyDeviceMessageSchemaContainerController', function(){
-  this.message = {};
-  this.device = {};
+  // this.message = {};
+  // this.device = {};
 });
