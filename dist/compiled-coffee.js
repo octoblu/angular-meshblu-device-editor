@@ -270,14 +270,7 @@
         };
       }
       newModel = validator.build(this.scope.model, validatorOptions);
-      if (this.scope.clearOnChange) {
-        _.each(_.keys(this.scope.model), (function(_this) {
-          return function(key) {
-            return delete _this.scope.model[key];
-          };
-        })(this));
-      }
-      return angular.copy(this.scope.model, newModel);
+      return angular.copy(newModel, this.scope.model);
     };
 
     MeshbluSchemaFormController.prototype.formSchema = function() {
