@@ -4,7 +4,7 @@ class SchemaSelectorController
   constructor: (@scope) ->
     @updateAvailableSchemas()
 
-    @scope.selectedSchemaKey = @scope.selectedSchema?.key
+    @scope.selectedSchemaKey ?= @scope.selectedSchema?.key
 
     @scope.$watch 'schemas', @updateAvailableSchemas
 

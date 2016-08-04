@@ -22,7 +22,7 @@ class ConfigureSchemaContainer
 
   resolveSchemas: =>
     return unless @scope.schemas?
-    @meshbluJsonSchemaResolver.resolve @scope.schemas, (error, schemas) =>      
+    @meshbluJsonSchemaResolver.resolve @scope.schemas, (error, schemas) =>
       @scope.selectedSchemaKey = @initialSchemaKey
       @scope.errorSchema = error
       @scope.resolvedSchemas = schemas
