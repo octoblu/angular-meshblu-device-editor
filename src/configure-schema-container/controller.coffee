@@ -12,7 +12,6 @@ class ConfigureSchemaContainer
       return unless selectedSchemaKey?
       _.set @scope.model, 'schemas.selected.configure', selectedSchemaKey
 
-
   resolveFormSchemas: =>
     return unless @scope.formSchemas?
     @meshbluJsonSchemaResolver.resolve @scope.formSchemas, (error, formSchemas) =>

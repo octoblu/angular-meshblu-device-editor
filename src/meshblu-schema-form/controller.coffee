@@ -19,7 +19,11 @@ class MeshbluSchemaFormController
     validator = jsen @scope.schema
     validatorOptions = {}
     validatorOptions = {additionalProperties: false} if @scope.clearOnChange
-    @scope.model = validator.build @scope.model, validatorOptions
+    newModel = validator.build @scope.model, validatorOptions
+    if @scope.clearOnChange
+      _.each _.keys(@scope.model), (key) =>
+        delete @scope.model[key]
+    angular.copy @scope.model, newModel
 
   formSchema: =>
     schema = @scope.schemas?[@scope.selectedSchemaKey]

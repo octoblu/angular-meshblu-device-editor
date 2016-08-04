@@ -252,7 +252,7 @@
     }
 
     MeshbluSchemaFormController.prototype.selectSchema = function() {
-      var validator, validatorOptions;
+      var newModel, validator, validatorOptions;
       if (!((this.scope.schemas != null) && (this.scope.formSchemas != null) && (this.scope.selectedSchemaKey != null))) {
         return;
       }
@@ -269,7 +269,15 @@
           additionalProperties: false
         };
       }
-      return this.scope.model = validator.build(this.scope.model, validatorOptions);
+      newModel = validator.build(this.scope.model, validatorOptions);
+      if (this.scope.clearOnChange) {
+        _.each(_.keys(this.scope.model), (function(_this) {
+          return function(key) {
+            return delete _this.scope.model[key];
+          };
+        })(this));
+      }
+      return angular.copy(this.scope.model, newModel);
     };
 
     MeshbluSchemaFormController.prototype.formSchema = function() {
