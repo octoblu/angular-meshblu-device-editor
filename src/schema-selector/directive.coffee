@@ -10,4 +10,5 @@ window
     selectedSchemaKey: '='
     schemas: '='
     confirmSchemaChangeFn: '='
+    label: '='
 }

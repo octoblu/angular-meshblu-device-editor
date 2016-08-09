@@ -154,7 +154,8 @@
         device: '=',
         model: '=',
         meshbluConfig: '=',
-        confirmSchemaChangeFn: '='
+        confirmSchemaChangeFn: '=',
+        label: '='
       }
     };
   });
@@ -223,7 +224,8 @@
         device: '=',
         message: '=',
         selectedSchemaKey: '=',
-        meshbluConfig: '='
+        meshbluConfig: '=',
+        label: '='
       }
     };
   });
@@ -399,6 +401,77 @@
 }).call(this);
 
 (function() {
+  var OctobluDeviceSchemaTransmogrifier, SchemaTransmogrifyController, _, angular;
+
+  _ = window._, angular = window.angular, OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
+
+  SchemaTransmogrifyController = (function() {
+    function SchemaTransmogrifyController(scope) {
+      this.scope = scope;
+      ({
+        constructor: function(scope1) {
+          this.scope = scope1;
+          return this.scope.$watch('device', this.setSchemas);
+        },
+        getConfigureFormSchemas: (function(_this) {
+          return function() {
+            var transmogrified;
+            transmogrified = _this.getTransmogrified();
+            return transmogrified.schemas.form;
+          };
+        })(this),
+        getConfigureSchemas: (function(_this) {
+          return function() {
+            var transmogrified;
+            transmogrified = _this.getTransmogrified();
+            return transmogrified.schemas.configure;
+          };
+        })(this),
+        getTransmogrified: (function(_this) {
+          return function() {
+            var transmogrifier;
+            transmogrifier = new OctobluDeviceSchemaTransmogrifier(_this.scope.device);
+            return transmogrifier.transmogrify();
+          };
+        })(this),
+        setSchemas: (function(_this) {
+          return function() {
+            if (!_this.scope.device) {
+              return;
+            }
+            _this.scope.schemas = _this.getConfigureSchemas();
+            _this.scope.formSchemas = _this.getConfigureFormSchemas();
+            return _this.scope.hasSchemas = !_.isEmpty(_this.scope.schemas);
+          };
+        })(this)
+      });
+    }
+
+    return SchemaTransmogrifyController;
+
+  })();
+
+  window.angular.module('angular-meshblu-device-editor').controller('SchemaTransmogrifyController', ['$scope', SchemaTransmogrifyController]);
+
+}).call(this);
+
+(function() {
+  window.angular.module('angular-meshblu-device-editor').directive('schemaTransmogrify', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'schema-transmogrify/template.html',
+      replace: true,
+      controller: 'SchemaTransmogrifyController',
+      scope: {
+        device: '=',
+        model: '='
+      }
+    };
+  });
+
+}).call(this);
+
+(function() {
   var MeshbluJsonSchemaResolver, SchemaSelectorController, _, angular, jsonSchemaDefaults,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -509,78 +582,8 @@
       scope: {
         selectedSchemaKey: '=',
         schemas: '=',
-        confirmSchemaChangeFn: '='
-      }
-    };
-  });
-
-}).call(this);
-
-(function() {
-  var OctobluDeviceSchemaTransmogrifier, SchemaTransmogrifyController, _, angular;
-
-  _ = window._, angular = window.angular, OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
-
-  SchemaTransmogrifyController = (function() {
-    function SchemaTransmogrifyController(scope) {
-      this.scope = scope;
-      ({
-        constructor: function(scope1) {
-          this.scope = scope1;
-          return this.scope.$watch('device', this.setSchemas);
-        },
-        getConfigureFormSchemas: (function(_this) {
-          return function() {
-            var transmogrified;
-            transmogrified = _this.getTransmogrified();
-            return transmogrified.schemas.form;
-          };
-        })(this),
-        getConfigureSchemas: (function(_this) {
-          return function() {
-            var transmogrified;
-            transmogrified = _this.getTransmogrified();
-            return transmogrified.schemas.configure;
-          };
-        })(this),
-        getTransmogrified: (function(_this) {
-          return function() {
-            var transmogrifier;
-            transmogrifier = new OctobluDeviceSchemaTransmogrifier(_this.scope.device);
-            return transmogrifier.transmogrify();
-          };
-        })(this),
-        setSchemas: (function(_this) {
-          return function() {
-            if (!_this.scope.device) {
-              return;
-            }
-            _this.scope.schemas = _this.getConfigureSchemas();
-            _this.scope.formSchemas = _this.getConfigureFormSchemas();
-            return _this.scope.hasSchemas = !_.isEmpty(_this.scope.schemas);
-          };
-        })(this)
-      });
-    }
-
-    return SchemaTransmogrifyController;
-
-  })();
-
-  window.angular.module('angular-meshblu-device-editor').controller('SchemaTransmogrifyController', ['$scope', SchemaTransmogrifyController]);
-
-}).call(this);
-
-(function() {
-  window.angular.module('angular-meshblu-device-editor').directive('schemaTransmogrify', function() {
-    return {
-      restrict: 'E',
-      templateUrl: 'schema-transmogrify/template.html',
-      replace: true,
-      controller: 'SchemaTransmogrifyController',
-      scope: {
-        device: '=',
-        model: '='
+        confirmSchemaChangeFn: '=',
+        label: '='
       }
     };
   });
