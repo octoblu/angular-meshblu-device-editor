@@ -43,12 +43,27 @@ var DEVICE = {
             title: "Name",
             type: "string"
           },
+          gender:  {
+            title: "Gender",
+            type: "string",
+            enum: ["nothing"],
+            default: "nothing"
+          },
           serialNumber:  {
             title: "Serial Number",
             type: "string"
+          },
+          parts: {
+            type: 'object',
+            properties: {
+              arm: {
+                type: 'string'
+              }
+            },
+            required: ["arm"],
           }
         },
-        required: ["name", "serialNumber"],
+        required: ["name", "serialNumber", "parts"],
         'x-form-schema': {
           angular: 'message.robot.angular'
         }
@@ -104,14 +119,14 @@ angular.module('example').controller('ExampleV2DeviceMessageSchemaContainerContr
 });
 
 angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerController', ['$timeout', function($timeout){
-  // var self = this;
-  //
-  // self.message = {};
-  // self.device = {};
-  //
-  // $timeout(function(){
-  //   self.device = angular.copy(OLD_DEVICE);
-  // }, 100);
+  var self = this;
+
+  self.message = {name: 'Mom'};
+  self.device = {};
+
+  $timeout(function(){
+    self.device = angular.copy(OLD_DEVICE);
+  }, 100);
 }]);
 
 angular.module('example').controller('ExampleEmptyDeviceMessageSchemaContainerController', function(){
