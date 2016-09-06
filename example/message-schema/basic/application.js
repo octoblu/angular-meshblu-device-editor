@@ -129,6 +129,128 @@ angular.module('example').controller('ExampleOldDeviceMessageSchemaContainerCont
   }, 100);
 }]);
 
+
+angular.module('example').controller('ExampleBadRequiredMessageSchemaContainerController', function(){
+    var device = {
+    "schemas": {
+      "message": {
+        "GetNextItems": {
+          "title": "Get Next Items",
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "count": {
+                  "title": "Item Count",
+                  "type": "integer",
+                  "default": 5
+                },
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "count"
+              ]
+            },
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "jobType": {
+                  "type": "string",
+                  "default": "GetNextItems",
+                  "enum": [
+                    "GetNextItems"
+                  ]
+                }
+              },
+              "required": [
+                "jobType"
+              ]
+            },
+            "required": [
+              "metadata",
+              "data"
+            ]
+          }
+        },
+        "GetCurrentItem": {
+          "title": "Get Current Item",
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            },
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "jobType": {
+                  "type": "string",
+                  "default": "GetCurrentItem",
+                  "enum": [
+                    "GetCurrentItem"
+                  ]
+                }
+              },
+              "required": [
+                "jobType"
+              ]
+            },
+            "required": [
+              "metadata",
+              "data"
+            ]
+          }
+        },
+        "GetPreviousItem": {
+          "title": "Get Previous Item",
+          "type": "object",
+          "properties": {
+            "data": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            },
+            "metadata": {
+              "type": "object",
+              "properties": {
+                "jobType": {
+                  "type": "string",
+                  "default": "GetPreviousItem",
+                  "enum": [
+                    "GetPreviousItem"
+                  ]
+                }
+              },
+              "required": [
+                "jobType"
+              ]
+            },
+            "required": [
+              "metadata",
+              "data"
+            ]
+          }
+        }
+      },
+      "version": "2.0.0"
+    }
+  };
+  this.message = {};
+  this.device = device;
+  this.selectedSchemaKey = 'robot'
+});
+
+
 angular.module('example').controller('ExampleEmptyDeviceMessageSchemaContainerController', function(){
   // this.message = {};
   // this.device = {};

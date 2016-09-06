@@ -264,7 +264,9 @@
       if (this.scope.isEmpty) {
         return;
       }
-      validator = jsen(this.scope.schema);
+      validator = jsen(this.scope.schema, {
+        greedy: true
+      });
       validatorOptions = {};
       if (this.scope.clearOnChange) {
         validatorOptions = {
@@ -275,7 +277,9 @@
       validator(oldModel);
       _.each(validator.errors, (function(_this) {
         return function(error) {
-          return _.set(oldModel, error.path, void 0);
+          console.log('error', error);
+          _.set(oldModel, error.path, void 0);
+          return true;
         };
       })(this));
       newModel = validator.build(oldModel, validatorOptions);

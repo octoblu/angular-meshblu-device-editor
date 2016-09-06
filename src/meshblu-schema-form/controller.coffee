@@ -16,13 +16,17 @@ class MeshbluSchemaFormController
     @scope.isEmpty = @isEmpty()
 
     return if @scope.isEmpty
-    validator = jsen @scope.schema
+    validator = jsen @scope.schema, greedy: true
     validatorOptions = {}
     validatorOptions = {additionalProperties: false} if @scope.clearOnChange
     oldModel = _.clone @scope.model
     validator oldModel
+
     _.each validator.errors, (error) =>
+      console.log 'error', error
       _.set oldModel, error.path, undefined
+      return true
+
     newModel = validator.build oldModel, validatorOptions
     angular.copy newModel, @scope.model
 
