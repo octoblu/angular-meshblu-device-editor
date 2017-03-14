@@ -1,6 +1,6 @@
 {
   "name": "angular-meshblu-device-editor",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "An Angular directive for editing Meshblu devices.",
   "main": "index.js",
   "directories": {
@@ -8,6 +8,7 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "bower": "^1.8.0",
     "gulp": "^3.9.1",
     "gulp-angular-templatecache": "^1.8.0",
     "gulp-bower": "0.0.13",
@@ -23,7 +24,7 @@
   "scripts": {
     "start": "gulp webserver",
     "test": "echo \"Error: no tests\" && exit 0",
-    "build": "gulp build"
+    "build": "gulp"
   },
   "repository": {
     "type": "git",
