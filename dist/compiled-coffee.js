@@ -163,76 +163,6 @@
 }).call(this);
 
 (function() {
-  var DeviceMessageSchemaContainer, OctobluDeviceSchemaTransmogrifier, _,
-    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-
-  _ = window._, OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
-
-  DeviceMessageSchemaContainer = (function() {
-    function DeviceMessageSchemaContainer(scope) {
-      this.scope = scope;
-      this.setSchemas = bind(this.setSchemas, this);
-      this.getTransmogrified = bind(this.getTransmogrified, this);
-      this.getMessageSchemas = bind(this.getMessageSchemas, this);
-      this.getMessageFormSchemas = bind(this.getMessageFormSchemas, this);
-      this.scope.$watch('device', this.setSchemas);
-    }
-
-    DeviceMessageSchemaContainer.prototype.getMessageFormSchemas = function() {
-      var transmogrified;
-      transmogrified = this.getTransmogrified();
-      return transmogrified.schemas.form;
-    };
-
-    DeviceMessageSchemaContainer.prototype.getMessageSchemas = function() {
-      var transmogrified;
-      transmogrified = this.getTransmogrified();
-      return transmogrified.schemas.message;
-    };
-
-    DeviceMessageSchemaContainer.prototype.getTransmogrified = function() {
-      var transmogrifier;
-      transmogrifier = new OctobluDeviceSchemaTransmogrifier(this.scope.device);
-      return transmogrifier.transmogrify();
-    };
-
-    DeviceMessageSchemaContainer.prototype.setSchemas = function() {
-      if (!this.scope.device) {
-        return;
-      }
-      this.scope.schemas = this.getMessageSchemas();
-      this.scope.formSchemas = this.getMessageFormSchemas();
-      return this.scope.hasSchemas = !_.isEmpty(this.scope.schemas);
-    };
-
-    return DeviceMessageSchemaContainer;
-
-  })();
-
-  window.angular.module('angular-meshblu-device-editor').controller('DeviceMessageSchemaContainer', ['$scope', DeviceMessageSchemaContainer]);
-
-}).call(this);
-
-(function() {
-  window.angular.module('angular-meshblu-device-editor').directive('deviceMessageSchemaContainer', function() {
-    return {
-      restrict: 'E',
-      templateUrl: 'device-message-schema-container/template.html',
-      replace: true,
-      controller: 'DeviceMessageSchemaContainer',
-      scope: {
-        device: '=',
-        message: '=',
-        selectedSchemaKey: '=',
-        meshbluConfig: '=',
-        label: '='
-      }
-    };
-  });
-
-}).call(this);
-
-(function() {
   var MeshbluSchemaFormController, _, angular, jsen,
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -329,6 +259,76 @@
         meshbluConfig: '=',
         model: '=',
         clearOnChange: '='
+      }
+    };
+  });
+
+}).call(this);
+
+(function() {
+  var DeviceMessageSchemaContainer, OctobluDeviceSchemaTransmogrifier, _,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
+  _ = window._, OctobluDeviceSchemaTransmogrifier = window.OctobluDeviceSchemaTransmogrifier;
+
+  DeviceMessageSchemaContainer = (function() {
+    function DeviceMessageSchemaContainer(scope) {
+      this.scope = scope;
+      this.setSchemas = bind(this.setSchemas, this);
+      this.getTransmogrified = bind(this.getTransmogrified, this);
+      this.getMessageSchemas = bind(this.getMessageSchemas, this);
+      this.getMessageFormSchemas = bind(this.getMessageFormSchemas, this);
+      this.scope.$watch('device', this.setSchemas);
+    }
+
+    DeviceMessageSchemaContainer.prototype.getMessageFormSchemas = function() {
+      var transmogrified;
+      transmogrified = this.getTransmogrified();
+      return transmogrified.schemas.form;
+    };
+
+    DeviceMessageSchemaContainer.prototype.getMessageSchemas = function() {
+      var transmogrified;
+      transmogrified = this.getTransmogrified();
+      return transmogrified.schemas.message;
+    };
+
+    DeviceMessageSchemaContainer.prototype.getTransmogrified = function() {
+      var transmogrifier;
+      transmogrifier = new OctobluDeviceSchemaTransmogrifier(this.scope.device);
+      return transmogrifier.transmogrify();
+    };
+
+    DeviceMessageSchemaContainer.prototype.setSchemas = function() {
+      if (!this.scope.device) {
+        return;
+      }
+      this.scope.schemas = this.getMessageSchemas();
+      this.scope.formSchemas = this.getMessageFormSchemas();
+      return this.scope.hasSchemas = !_.isEmpty(this.scope.schemas);
+    };
+
+    return DeviceMessageSchemaContainer;
+
+  })();
+
+  window.angular.module('angular-meshblu-device-editor').controller('DeviceMessageSchemaContainer', ['$scope', DeviceMessageSchemaContainer]);
+
+}).call(this);
+
+(function() {
+  window.angular.module('angular-meshblu-device-editor').directive('deviceMessageSchemaContainer', function() {
+    return {
+      restrict: 'E',
+      templateUrl: 'device-message-schema-container/template.html',
+      replace: true,
+      controller: 'DeviceMessageSchemaContainer',
+      scope: {
+        device: '=',
+        message: '=',
+        selectedSchemaKey: '=',
+        meshbluConfig: '=',
+        label: '='
       }
     };
   });
