@@ -1,6 +1,6 @@
 {
   "name": "angular-meshblu-device-editor",
-  "version": "4.0.5",
+  "version": "4.0.6",
   "description": "An Angular directive for editing Meshblu devices.",
   "main": "index.js",
   "directories": {

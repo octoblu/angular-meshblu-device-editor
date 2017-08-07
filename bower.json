@@ -30,8 +30,7 @@
     "jsen": "^0.6.1"
   },
   "resolutions": {
-    "angular": "1.6.3",
-    "lodash": "3.10.1"
+    "angular": "1.6.3"
   },
   "overrides": {
     "json-schema-defaults": {
